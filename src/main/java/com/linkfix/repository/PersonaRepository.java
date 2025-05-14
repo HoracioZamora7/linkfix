@@ -5,11 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.linkfix.entity.UsuarioEntity;
-
+import com.linkfix.entity.PersonaEntity;
 @Repository
-public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long>
+public interface PersonaRepository extends JpaRepository<PersonaEntity, Long>
 {
-    @Query("select u from UsuarioEntity u where u.estado.id = 1")
-    List<UsuarioEntity> findAllCustom();
+    List<PersonaEntity> findAll();
 }

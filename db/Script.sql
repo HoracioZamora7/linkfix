@@ -2411,5 +2411,8 @@ alter table Incidencia add constraint fk_incidencia_estado
 foreign key (idEstado) references Estado(id);
 
 
+/*roles*/
 insert into rol(nombre) values('Administrador'),('Cliente'),('Técnico')
+/*estados usuario*/
+insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente'), ('Rechazado')
 
