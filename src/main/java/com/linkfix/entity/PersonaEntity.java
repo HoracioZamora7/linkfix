@@ -34,7 +34,7 @@ public class PersonaEntity implements Serializable{
 
     @ManyToOne
     @JoinColumn(name = "idUbigeo")
-    private Ubigeo_peru_districtsEntity ubigeo;
+    private ubigeo_distritosEntity ubigeo;
 
     @Column(name = "telefono")
     private String telefono;

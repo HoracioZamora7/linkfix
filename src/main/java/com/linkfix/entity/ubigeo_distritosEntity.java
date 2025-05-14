@@ -14,10 +14,10 @@ import java.io.Serializable;
 @Builder
 
 
-@Entity(name = "Ubigeo_peru_districts")
-@Table(name = "ubigeo_peru_districts")
+@Entity(name = "Ubigeo_distritosEntity")
+@Table(name = "ubigeo_distritos")
 
-public class Ubigeo_peru_districtsEntity implements Serializable{
+public class ubigeo_distritosEntity implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id

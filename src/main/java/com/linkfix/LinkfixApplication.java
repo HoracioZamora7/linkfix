@@ -1,4 +1,4 @@
-package com.linkfix.linkfix;
+package com.linkfix;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

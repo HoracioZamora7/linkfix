@@ -7,31 +7,6 @@ use linkfix;
 /*creacion tablas*/
 
 
-/* obsoleto
-departamento
-create table Departamento
-(
-	id int auto_increment,
-	nombre varchar(50) not null,
-	primary key (id)
-);provincia
-create table Provincia
-(
-	id int auto_increment,
-	nombre varchar(50) not null,
-	primary key (id)
-);
-distrito
-create table Distrito
-(
-	id int auto_increment,
-	nombre varchar(50) not null,
-	primary key (id)
-);
- */
- 
-
-
 /*persona*/
 create table Persona
 (
@@ -157,7 +132,7 @@ create table Incidencia
 /*tablas ubigeo, extraido de https://github.com/ernestorivero/Ubigeo-Peru/blob/master/sql/ubigeo_peru_inei_2016.sql*/
 --
 
-CREATE TABLE IF NOT EXISTS ubigeo_peru_departments (
+CREATE TABLE IF NOT EXISTS departamento (
   `id` varchar(2) NOT NULL,
   `name` varchar(45) NOT NULL
 ) ;
@@ -165,10 +140,10 @@ CREATE TABLE IF NOT EXISTS ubigeo_peru_departments (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `ubigeo_peru_districts`
+-- Estructura de tabla para la tabla `ubigeo_distritos`
 --
 
-CREATE TABLE IF NOT EXISTS ubigeo_peru_districts (
+CREATE TABLE IF NOT EXISTS ubigeo_distritos (
   `id` varchar(6) NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `province_id` varchar(4) DEFAULT NULL,
@@ -180,19 +155,19 @@ CREATE TABLE IF NOT EXISTS ubigeo_peru_districts (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `ubigeo_peru_provinces`
+-- Estructura de tabla para la tabla `provincia`
 --
-CREATE TABLE IF NOT EXISTS ubigeo_peru_provinces (
+CREATE TABLE IF NOT EXISTS provincia (
   `id` varchar(4) NOT NULL,
   `name` varchar(45) NOT NULL,
   `department_id` varchar(2) NOT NULL
 ) ;
 
 --
--- Volcado de datos para la tabla `ubigeo_peru_departments`
+-- Volcado de datos para la tabla `departamento`
 --
 
-INSERT INTO `ubigeo_peru_departments` (`id`, `name`) VALUES
+INSERT INTO `departamento` (`id`, `name`) VALUES
 ('01', 'Amazonas'),
 ('02', 'Áncash'),
 ('03', 'Apurímac'),
@@ -221,10 +196,10 @@ INSERT INTO `ubigeo_peru_departments` (`id`, `name`) VALUES
 
 
 --
--- Volcado de datos para la tabla `ubigeo_peru_districts`
+-- Volcado de datos para la tabla `ubigeo_distritos`
 --
 
-INSERT INTO `ubigeo_peru_districts` (`id`, `name`, `province_id`, `department_id`) VALUES
+INSERT INTO `ubigeo_distritos` (`id`, `name`, `province_id`, `department_id`) VALUES
 ('010101', 'Chachapoyas', '0101', '01'),
 ('010102', 'Asunción', '0101', '01'),
 ('010103', 'Balsas', '0101', '01'),
@@ -1565,7 +1540,7 @@ INSERT INTO `ubigeo_peru_districts` (`id`, `name`, `province_id`, `department_id
 ('150405', 'Lachaqui', '1504', '15'),
 ('150406', 'San Buenaventura', '1504', '15'),
 ('150407', 'Santa Rosa de Quives', '1504', '15');
-INSERT INTO `ubigeo_peru_districts` (`id`, `name`, `province_id`, `department_id`) VALUES
+INSERT INTO `ubigeo_distritos` (`id`, `name`, `province_id`, `department_id`) VALUES
 ('150501', 'San Vicente de Cañete', '1505', '15'),
 ('150502', 'Asia', '1505', '15'),
 ('150503', 'Calango', '1505', '15'),
@@ -2104,15 +2079,15 @@ INSERT INTO `ubigeo_peru_districts` (`id`, `name`, `province_id`, `department_id
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `ubigeo_peru_provinces`
+-- Estructura de tabla para la tabla `provincia`
 --
 
 
 --
--- Volcado de datos para la tabla `ubigeo_peru_provinces`
+-- Volcado de datos para la tabla `provincia`
 --
 
-INSERT INTO `ubigeo_peru_provinces` (`id`, `name`, `department_id`) VALUES
+INSERT INTO `provincia` (`id`, `name`, `department_id`) VALUES
 ('0101', 'Chachapoyas', '01'),
 ('0102', 'Bagua', '01'),
 ('0103', 'Bongará', '01'),
@@ -2315,20 +2290,20 @@ INSERT INTO `ubigeo_peru_provinces` (`id`, `name`, `department_id`) VALUES
 --
 
 --
--- Indices de la tabla `ubigeo_peru_departments`
+-- Indices de la tabla `departamento`
 --
-ALTER TABLE `ubigeo_peru_departments`
+ALTER TABLE `departamento`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `ubigeo_peru_districts`
+-- Indices de la tabla `ubigeo_distritos`
 --
 
 
 --
--- Indices de la tabla `ubigeo_peru_provinces`
+-- Indices de la tabla `provincia`
 --
-ALTER TABLE `ubigeo_peru_provinces`
+ALTER TABLE `provincia`
   ADD PRIMARY KEY (`id`);
 
 
@@ -2345,7 +2320,7 @@ alter table Persona add constraint fk_persona_distrito
 foreign key (idDistrito) references Distrito(id);
 */
 alter table Persona add constraint fk_persona_distrito
-foreign key (idUbigeo ) references ubigeo_peru_districts(id);
+foreign key (idUbigeo ) references ubigeo_distritos(id);
  
 
 
@@ -2411,8 +2386,11 @@ alter table Incidencia add constraint fk_incidencia_estado
 foreign key (idEstado) references Estado(id);
 
 
-/*roles*/
-insert into rol(nombre) values('Administrador'),('Cliente'),('Técnico')
+insert into rol(nombre) values('Administrador'),('Cliente'),('Técnico');
+
 /*estados usuario*/
-insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente'), ('Rechazado')
+insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente'), ('Rechazado');
+
+
+
 
