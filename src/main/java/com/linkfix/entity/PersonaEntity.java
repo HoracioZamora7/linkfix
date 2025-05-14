@@ -23,22 +23,22 @@ public class PersonaEntity implements Serializable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codigo;
 
-    @Column(name = "nombre")
+    @Column(name = "nombre", length = 50)
     private String nombre;
 
-    @Column(name = "apellidos")
+    @Column(name = "apellidos", length = 50)
     private String apellidos;
 
-    @Column(name = "dni")
+    @Column(name = "dni", length = 8)
     private String dni;
 
     @ManyToOne
     @JoinColumn(name = "idUbigeo")
     private UbigeoDistritosEntity ubigeo;
 
-    @Column(name = "telefono")
+    @Column(name = "telefono", length = 9)
     private String telefono;
 
-    @Column(name = "direccion")
+    @Column(name = "direccion", length = 75)
     private String direccion;
 }

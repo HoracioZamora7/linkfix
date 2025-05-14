@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulario de Registro</title>
+    <!-- Estilos opcionales (ej. Bootstrap) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Registro de Usuario</h2>
+        <form th:action="@{/registro}" th:object="${usuario}" method="post">
+            <!-- Datos Personales -->
+            <div class="mb-3">
+                <label for="nombre" class="form-label">Nombre:</label>
+                <input type="text" maxlength="50" th:field="*{persona.nombre}" class="form-control" placeholder="Nombre">
+            </div>
+            <div class="mb-3">
+                <label for="apellidos" class="form-label">Apellidos:</label>
+                <input type="text" maxlength="50" th:field="*{persona.apellidos}" class="form-control" placeholder="Apellidos">
+            </div>
+            
+            <div class="mb-3">
+                <label for="dni" class="form-label">DNI:</label>
+                <input type="number" size="8" minlength="8" maxlength="8" th:field="*{persona.dni}" class="form-control" placeholder="DNI">
+            </div>
+
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono:</label>
+                <input type="number" maxlength="9" th:field="*{persona.telefono}" class="form-control" placeholder="Número telefónico">
+            </div>
+
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección:</label>
+                <input type="text" maxlength="75" th:field="*{persona.direccion}" class="form-control" placeholder="Dirección de domicilio (Calle, avenidas, etc)">
+            </div>
+
+            <div class="mb-3">
+                <label for="correo" class="form-label">Correo electrónico:</label>
+                <input type="text" maxlength="50" th:field="*{correo}" class="form-control" placeholder="E-Mail">
+            </div>
+
+            <div class="mb-3">
+                <label for="contrasena" class="form-label">Contraseña:</label>
+                <input type="text" maxlength="255" th:field="*{contrasena}" class="form-control" placeholder="Contraseña">
+            </div>
+
+
+            <!-- Departamento -->
+            <div class="mb-3">
+                <label for="departamento" class="form-label">Departamento:</label>
+                <select id="departamento" name="departamento" class="form-select">
+                    <option value="">Seleccione departamento</option>
+                    <option th:each="dep : ${departamentos}"
+                            th:value="${dep.id}"
+                            th:text="${dep.name}">
+                    </option>
+                </select>
+            </div>
+
+            <!-- Provincia -->
+            <div class="mb-3">
+                <label for="provincia" class="form-label">Provincia:</label>
+                <select id="provincia" name="provincia" class="form-select">
+                    <option value="">Seleccione provincia</option>
+                </select>
+            </div>
+
+            <!-- Distrito -->
+            <div class="mb-3">
+                <label for="distrito" class="form-label">Distrito:</label>
+                <select id="distrito" name="distrito" class="form-select">
+                    <option value="">Seleccione distrito</option>
+                </select>
+            </div>
+
+            <!-- Botón -->
+            <button type="submit" class="btn btn-primary">Registrar</button>
+        </form>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        document.getElementById("departamento").addEventListener("change", function () {
+            const deptId = this.value;
+            fetch(`/api/provincia/listarPorDepartamento?departmentId=${deptId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const provinciaSelect = document.getElementById("provincia");
+                    provinciaSelect.innerHTML = '<option value="">Seleccione provincia</option>';
+                    data.forEach(p => {
+                        provinciaSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                    });
+                    // Limpiar distritos
+                    document.getElementById("distrito").innerHTML = '<option value="">Seleccione distrito</option>';
+                });
+        });
+
+        document.getElementById("provincia").addEventListener("change", function () {
+            const provId = this.value;
+            fetch(`/api/distrito/listarPorProvincia?provinceId=${provId}`)
+                .then(res => res.json())
+                .then(data => {
+                    const distritoSelect = document.getElementById("distrito");
+                    distritoSelect.innerHTML = '<option value="">Seleccione distrito</option>';
+                    data.forEach(d => {
+                        distritoSelect.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                    });
+                });
+        });
+    </script>
+</body>
+</html>

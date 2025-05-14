@@ -30,11 +30,11 @@ public class UsuarioEntity implements Serializable{
     @JoinColumn(name = "idPersona")
     private PersonaEntity persona;
 
-    @Column(name = "correo")
+    @Column(name = "correo", length = 50)
     private String correo;
 
     @Column(name = "contrasena")
-    private String password;
+    private String contrasena;
 
     @Column(name = "calificacion")
     private float calificacion;
