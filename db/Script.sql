@@ -5,6 +5,8 @@ use linkfix;
 
 
 /*creacion tablas*/
+
+
 /* obsoleto
 departamento
 create table Departamento
@@ -12,8 +14,7 @@ create table Departamento
 	id int auto_increment,
 	nombre varchar(50) not null,
 	primary key (id)
-);
-provincia
+);provincia
 create table Provincia
 (
 	id int auto_increment,
@@ -49,9 +50,11 @@ create table Usuario
 	id bigint auto_increment,
 	idPersona bigint unique,
 	correo varchar(50) unique not null,
-	contrasena varchar(30),
+	contrasena varchar(255),
 	calificacion float,
-	estado bit,
+	idEstado int,
+	fecha_registro DATETIME default now(),
+	
 	primary key (id)
 );
 /*Rol*/
@@ -2349,6 +2352,9 @@ foreign key (idUbigeo ) references ubigeo_peru_districts(id);
 -- Usuario -> Persona
 alter table Usuario add constraint fk_usuario_persona
 foreign key (idPersona) references Persona(id);
+-- Usuario -> Estado
+alter table Usuario add constraint fk_usuario_estado
+foreign key (idEstado) references Estado(id);
 
 -- Usuario_rol -> Usuario, Rol
 alter table Usuario_rol add constraint fk_usuario_rol_usuario
