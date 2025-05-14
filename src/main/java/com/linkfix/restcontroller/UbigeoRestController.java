@@ -1,6 +1,6 @@
 package com.linkfix.restcontroller;
 
-import com.linkfix.entity.ubigeo_distritosEntity;
+import com.linkfix.entity.UbigeoDistritosEntity;
 import com.linkfix.service.UbigeoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +18,20 @@ public class UbigeoRestController {
 
     //Listar todos los distritos
     @GetMapping("/lista")
-    public List<ubigeo_distritosEntity> listAll() {
+    public List<UbigeoDistritosEntity> listAll() {
         return service.listAll();
     }
 
     //Buscar distrito por id
     @GetMapping("/buscar")
-    public Optional<ubigeo_distritosEntity> findById(@RequestParam String id) 
+    public Optional<UbigeoDistritosEntity> findById(@RequestParam String id) 
     {
         return service.findById(id);
     }
 
     //Listar distritos por provincia id
     @GetMapping("/listarPorProvincia")
-    public List<ubigeo_distritosEntity> findByProvinceId(@RequestParam String provinceId) 
+    public List<UbigeoDistritosEntity> findByProvinceId(@RequestParam String provinceId) 
     {
         return service.findByProvinceId(provinceId);
     }

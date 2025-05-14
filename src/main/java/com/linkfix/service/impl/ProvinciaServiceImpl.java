@@ -4,6 +4,7 @@ import com.linkfix.entity.ProvinciaEntity;
 import com.linkfix.repository.ProvinciaRepository;
 import com.linkfix.service.ProvinciaService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,12 +12,8 @@ import java.util.List;
 @Service
 public class ProvinciaServiceImpl implements ProvinciaService {
 
-    /* @Autowired */
-    private final ProvinciaRepository repository;
-
-    public ProvinciaServiceImpl(ProvinciaRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private ProvinciaRepository repository;
 
     @Override
     public List<ProvinciaEntity> findAll() {

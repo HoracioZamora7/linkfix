@@ -17,9 +17,9 @@ public class ProvinciaEntity implements Serializable {
     @Column
     private String id;
 
-    @Column(length = 45)
+    @Column(name="name")
     private String name;
 
-    @Column
-    private String department_id;
+    @Column(name="departmentId")
+    private String departmentId;
 }

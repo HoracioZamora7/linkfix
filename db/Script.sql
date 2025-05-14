@@ -6,7 +6,6 @@ use linkfix;
 
 /*creacion tablas*/
 
-
 /*persona*/
 create table Persona
 (
@@ -140,14 +139,14 @@ CREATE TABLE IF NOT EXISTS departamento (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `ubigeo_distritos`
+-- Estructura de tabla para la tabla `ubigeoDistritos`
 --
 
-CREATE TABLE IF NOT EXISTS ubigeo_distritos (
+CREATE TABLE IF NOT EXISTS ubigeoDistritos (
   `id` varchar(6) NOT NULL,
   `name` varchar(45) DEFAULT NULL,
-  `province_id` varchar(4) DEFAULT NULL,
-  `department_id` varchar(2) DEFAULT null,
+  `provinceId` varchar(4) DEFAULT NULL,
+  `departmentId` varchar(2) DEFAULT null,
   primary key (id)
 ) ;
 
@@ -160,7 +159,7 @@ CREATE TABLE IF NOT EXISTS ubigeo_distritos (
 CREATE TABLE IF NOT EXISTS provincia (
   `id` varchar(4) NOT NULL,
   `name` varchar(45) NOT NULL,
-  `department_id` varchar(2) NOT NULL
+  `departmentId` varchar(2) NOT NULL
 ) ;
 
 --
@@ -196,10 +195,10 @@ INSERT INTO `departamento` (`id`, `name`) VALUES
 
 
 --
--- Volcado de datos para la tabla `ubigeo_distritos`
+-- Volcado de datos para la tabla `ubigeoDistritos`
 --
 
-INSERT INTO `ubigeo_distritos` (`id`, `name`, `province_id`, `department_id`) VALUES
+INSERT INTO `ubigeoDistritos` (`id`, `name`, `provinceId`, `departmentId`) VALUES
 ('010101', 'Chachapoyas', '0101', '01'),
 ('010102', 'Asunción', '0101', '01'),
 ('010103', 'Balsas', '0101', '01'),
@@ -1540,7 +1539,7 @@ INSERT INTO `ubigeo_distritos` (`id`, `name`, `province_id`, `department_id`) VA
 ('150405', 'Lachaqui', '1504', '15'),
 ('150406', 'San Buenaventura', '1504', '15'),
 ('150407', 'Santa Rosa de Quives', '1504', '15');
-INSERT INTO `ubigeo_distritos` (`id`, `name`, `province_id`, `department_id`) VALUES
+INSERT INTO `ubigeoDistritos` (`id`, `name`, `provinceId`, `departmentId`) VALUES
 ('150501', 'San Vicente de Cañete', '1505', '15'),
 ('150502', 'Asia', '1505', '15'),
 ('150503', 'Calango', '1505', '15'),
@@ -2087,7 +2086,7 @@ INSERT INTO `ubigeo_distritos` (`id`, `name`, `province_id`, `department_id`) VA
 -- Volcado de datos para la tabla `provincia`
 --
 
-INSERT INTO `provincia` (`id`, `name`, `department_id`) VALUES
+INSERT INTO `provincia` (`id`, `name`, `departmentId`) VALUES
 ('0101', 'Chachapoyas', '01'),
 ('0102', 'Bagua', '01'),
 ('0103', 'Bongará', '01'),
@@ -2296,7 +2295,7 @@ ALTER TABLE `departamento`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indices de la tabla `ubigeo_distritos`
+-- Indices de la tabla `ubigeoDistritos`
 --
 
 
@@ -2320,7 +2319,7 @@ alter table Persona add constraint fk_persona_distrito
 foreign key (idDistrito) references Distrito(id);
 */
 alter table Persona add constraint fk_persona_distrito
-foreign key (idUbigeo ) references ubigeo_distritos(id);
+foreign key (idUbigeo ) references ubigeoDistritos(id);
  
 
 
@@ -2390,7 +2389,3 @@ insert into rol(nombre) values('Administrador'),('Cliente'),('Técnico');
 
 /*estados usuario*/
 insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente'), ('Rechazado');
-
-
-
-

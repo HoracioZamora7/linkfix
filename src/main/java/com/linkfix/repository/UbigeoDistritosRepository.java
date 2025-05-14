@@ -1,6 +1,6 @@
 package com.linkfix.repository;
 
-import com.linkfix.entity.ubigeo_distritosEntity;
+import com.linkfix.entity.UbigeoDistritosEntity;
 
 import java.util.List;
 
@@ -10,12 +10,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface UbigeoRepository extends JpaRepository<ubigeo_distritosEntity, String> {
+public interface UbigeoDistritosRepository extends JpaRepository<UbigeoDistritosEntity, String> {
     
     /* lo mismo */
     /* List<ubigeo_distritosEntity> findByProvinceId(String provinceId); */
 
     /* listar distritos por idprovincia*/
-    @Query("SELECT DISTINCT u FROM ubigeo_distritos u WHERE u.province_id = :provinceId")
-    List<ubigeo_distritosEntity> findByProvinceId(@Param("provinceId") String provinceId);
+    @Query("SELECT DISTINCT u FROM UbigeoDistritosEntity u WHERE u.provinceId = :provinceId")
+    List<UbigeoDistritosEntity> findByProvinceId(@Param("provinceId") String provinceId);
 }

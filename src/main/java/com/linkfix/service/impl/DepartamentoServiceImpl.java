@@ -4,6 +4,7 @@ import com.linkfix.entity.DepartamentoEntity;
 import com.linkfix.repository.DepartamentoRepository;
 import com.linkfix.service.DepartamentoService;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,11 +12,8 @@ import java.util.List;
 @Service
 public class DepartamentoServiceImpl implements DepartamentoService {
 
-    private final DepartamentoRepository repository;
-
-    public DepartamentoServiceImpl(DepartamentoRepository repository) {
-        this.repository = repository;
-    }
+    @Autowired
+    private DepartamentoRepository repository;
 
     @Override
     public List<DepartamentoEntity> findAll() {

@@ -18,6 +18,6 @@ public class DepartamentoEntity implements Serializable
     @Column
     private String id;
 
-    @Column(length = 45)
+    @Column(name="name")
     private String name;
 }

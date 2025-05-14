@@ -14,10 +14,10 @@ import java.io.Serializable;
 @Builder
 
 
-@Entity(name = "Ubigeo_distritosEntity")
-@Table(name = "ubigeo_distritos")
+@Entity(name = "UbigeoDistritosEntity")
+@Table(name = "UbigeoDistritos")
 
-public class ubigeo_distritosEntity implements Serializable{
+public class UbigeoDistritosEntity implements Serializable{
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -27,9 +27,9 @@ public class ubigeo_distritosEntity implements Serializable{
     @Column(name = "name")
     private String name;
 
-    @Column(name = "province_id")
-    private String province_id;
+    @Column(name = "provinceId")
+    private String provinceId;
 
-    @Column(name = "department_id")
-    private String department_id;
+    @Column(name = "departmentId")
+    private String departmentId;
 }
