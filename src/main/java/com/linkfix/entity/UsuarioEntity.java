@@ -33,7 +33,7 @@ public class UsuarioEntity implements Serializable{
     @Column(name = "correo", length = 50)
     private String correo;
 
-    @Column(name = "contrasena")
+    @Column(name = "contrasena", length = 255)
     private String contrasena;
 
     @Column(name = "calificacion")

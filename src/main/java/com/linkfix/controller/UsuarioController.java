@@ -3,6 +3,7 @@ package com.linkfix.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +39,8 @@ public class UsuarioController {
     @Autowired
     private EstadoService estadoService;
 
+    /* @Autowired
+    PasswordEncoder passwordEncoder; */
 
     @Transient
     private List<String> rolesSeleccionados;
@@ -45,27 +48,32 @@ public class UsuarioController {
     @PostMapping("/registro")
     public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario)
     {
+        //encriptar la contra
+        /* usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena())); */
+
         personaService.save(usuario.getPersona());
         usuario.setEstado(estadoService.findByNombre("Activo"));
         usuarioService.save(usuario);
-        
-        UsuarioRolEntity clienterol = new UsuarioRolEntity();
-        clienterol.setUsuario(usuario);
+         
         
         if(usuario.isCliente())
         {
+            UsuarioRolEntity clienterol = new UsuarioRolEntity();
+            clienterol.setUsuario(usuario);
             clienterol.setRol(rolService.findByNombre("Cliente"));
             usuarioRolSevice.save(clienterol);
         }
-        
+
         if(usuario.isTecnico())
         {
+            UsuarioRolEntity clienterol = new UsuarioRolEntity();
+            clienterol.setUsuario(usuario);
             clienterol.setRol(rolService.findByNombre("Técnico"));
             usuarioRolSevice.save(clienterol);
+
+            usuario.setEstado(estadoService.findByNombre("Pendiente"));
             usuarioService.update(usuario);
         }
-
-    
         return "redirect:/index";
     }
 

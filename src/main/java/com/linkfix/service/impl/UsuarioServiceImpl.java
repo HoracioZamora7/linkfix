@@ -3,6 +3,7 @@ package com.linkfix.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.linkfix.entity.UsuarioEntity;
@@ -15,6 +16,9 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Autowired
     private UsuarioRepository repository;
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     @Override
     public List<UsuarioEntity> listAll() 
     {
@@ -24,11 +28,13 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioEntity save(UsuarioEntity u) 
     {
+        u.setContrasena(passwordEncoder.encode(u.getContrasena()));
         return repository.save(u);
     }
 
     @Override
     public UsuarioEntity update(UsuarioEntity u) {
-       return repository.save(u);
+        u.setContrasena(passwordEncoder.encode(u.getContrasena()));
+        return repository.save(u);
     }
 }
