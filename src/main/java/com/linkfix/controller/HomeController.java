@@ -29,5 +29,10 @@ public class HomeController {
         return "registrar";
     }
 
+    @GetMapping("/index")
+    public String mostrarIndex()
+    { 
+        return "index";
+    }
 
 }

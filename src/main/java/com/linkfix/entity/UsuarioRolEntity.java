@@ -12,11 +12,11 @@ import jakarta.persistence.*;
 @Builder
 
 
-@Entity(name = "Usuario_rolEntity")
-@Table(name = "Usuario_rol")
+@Entity(name = "UsuarioRolEntity")
+@Table(name = "UsuarioRol")
 
 
-public class Usuario_rolEntity {
+public class UsuarioRolEntity {
 
     
     @Id

@@ -6,6 +6,7 @@ use linkfix;
 
 /*creacion tablas*/
 
+
 /*persona*/
 create table Persona
 (
@@ -15,7 +16,7 @@ create table Persona
 	dni char(8) unique not null,
 	idUbigeo varchar(6),
 	telefono varchar(9) unique,
-	direcicon varchar(75),
+	direccion varchar(75),
 	primary key (id)
 );
 /*usuario*/
@@ -38,8 +39,8 @@ create table Rol
 	nombre varchar(100) unique not null,
 	primary key (id)
 );
-/*usuario_rol*/
-create table Usuario_rol
+/*UsuarioRol*/
+create table UsuarioRol
 (
 	id bigint auto_increment,
 	idUsuario bigint not null,
@@ -2330,11 +2331,11 @@ foreign key (idPersona) references Persona(id);
 alter table Usuario add constraint fk_usuario_estado
 foreign key (idEstado) references Estado(id);
 
--- Usuario_rol -> Usuario, Rol
-alter table Usuario_rol add constraint fk_usuario_rol_usuario
+-- UsuarioRol -> Usuario, Rol
+alter table UsuarioRol add constraint fk_UsuarioRol_usuario
 foreign key (idUsuario) references Usuario(id);
 
-alter table Usuario_rol add constraint fk_usuario_rol_rol
+alter table UsuarioRol add constraint fk_UsuarioRol_rol
 foreign key (idRol) references Rol(id);
 
 -- Disponibilidad -> Usuario, Dia

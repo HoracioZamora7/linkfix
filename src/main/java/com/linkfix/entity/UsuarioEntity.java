@@ -45,5 +45,11 @@ public class UsuarioEntity implements Serializable{
 
     @Column(name = "fecha_registro")
     private Date fecha_registro;
+
+    @Transient
+    private boolean tecnico;
+
+    @Transient
+    private boolean cliente;
 }
 

@@ -26,4 +26,9 @@ public class UsuarioServiceImpl implements UsuarioService {
     {
         return repository.save(u);
     }
+
+    @Override
+    public UsuarioEntity update(UsuarioEntity u) {
+       return repository.save(u);
+    }
 }

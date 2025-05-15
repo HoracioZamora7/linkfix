@@ -12,6 +12,5 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long>
 {
     @Query("select u from UsuarioEntity u where u.estado.id = 1")
     List<UsuarioEntity> findAllCustom();
-    List<UsuarioEntity> findAll();
-    
+    List<UsuarioEntity> findAll();    
 }

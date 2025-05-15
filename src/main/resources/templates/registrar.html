@@ -69,10 +69,18 @@
             <!-- Distrito -->
             <div class="mb-3">
                 <label for="distrito" class="form-label">Distrito:</label>
-                <select id="distrito" name="distrito" class="form-select">
+                <select id="distrito" th:field="*{persona.ubigeo.id}" name="distrito" class="form-select">
                     <option value="">Seleccione distrito</option>
                 </select>
             </div>
+
+            <!-- Checkboxes roles-->
+            <h3>Deseo registrarme como: </h3>
+            <input type="checkbox" th:field="*{cliente}" id="cliente" />
+            <label for="esCliente">Cliente</label>
+
+            <input type="checkbox" th:field="*{tecnico}" id="tecnico" />
+            <label for="esTecnico">Técnico (requerirá verificación posterior)</label>
 
             <!-- Botón -->
             <button type="submit" class="btn btn-primary">Registrar</button>
@@ -81,6 +89,8 @@
 
     <!-- Scripts -->
     <script>
+
+        /* listener del select <departamento> para actualizar <provincia>*/
         document.getElementById("departamento").addEventListener("change", function () {
             const deptId = this.value;
             fetch(`/api/provincia/listarPorDepartamento?departmentId=${deptId}`)
@@ -96,6 +106,7 @@
                 });
         });
 
+        /*lo mismo, pero para provincia-distrito*/
         document.getElementById("provincia").addEventListener("change", function () {
             const provId = this.value;
             fetch(`/api/distrito/listarPorProvincia?provinceId=${provId}`)
