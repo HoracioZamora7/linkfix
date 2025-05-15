@@ -3,53 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <title>Formulario de Registro</title>
-    <!-- Estilos opcionales (ej. Bootstrap) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-4">
         <h2>Registro de Usuario</h2>
+
+        <!-- Mensajes de éxito o error -->
+        <div th:if="${mensajeExito}" class="alert alert-success" th:text="${mensajeExito}"></div>
+        <div th:if="${mensajeError}" class="alert alert-danger" th:text="${mensajeError}"></div>
+
         <form th:action="@{/registro}" th:object="${usuario}" method="post">
-            <!-- Datos Personales -->
+            <!-- Nombre -->
             <div class="mb-3">
                 <label for="nombre" class="form-label">Nombre:</label>
-                <input type="text" maxlength="50" th:field="*{persona.nombre}" class="form-control" placeholder="Nombre">
+                <input type="text" maxlength="50" th:field="*{persona.nombre}" class="form-control" placeholder="Nombre" required>
             </div>
+
+            <!-- Apellidos -->
             <div class="mb-3">
                 <label for="apellidos" class="form-label">Apellidos:</label>
-                <input type="text" maxlength="50" th:field="*{persona.apellidos}" class="form-control" placeholder="Apellidos">
+                <input type="text" maxlength="50" th:field="*{persona.apellidos}" class="form-control" placeholder="Apellidos" required>
             </div>
             
+            <!-- DNI -->
             <div class="mb-3">
                 <label for="dni" class="form-label">DNI:</label>
-                <input type="number" size="8" minlength="8" maxlength="8" th:field="*{persona.dni}" class="form-control" placeholder="DNI">
+                <input type="text" pattern="\d{8}" minlength="8" maxlength="8" th:field="*{persona.dni}" class="form-control" placeholder="DNI (8 dígitos)" required>
             </div>
 
+            <!-- Teléfono -->
             <div class="mb-3">
                 <label for="telefono" class="form-label">Teléfono:</label>
-                <input type="number" maxlength="9" th:field="*{persona.telefono}" class="form-control" placeholder="Número telefónico">
+                <input type="text" pattern="\d{9}" maxlength="9" th:field="*{persona.telefono}" class="form-control" placeholder="Teléfono (9 dígitos)" required>
             </div>
 
+            <!-- Dirección -->
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección:</label>
-                <input type="text" maxlength="75" th:field="*{persona.direccion}" class="form-control" placeholder="Dirección de domicilio (Calle, avenidas, etc)">
+                <input type="text" maxlength="75" th:field="*{persona.direccion}" class="form-control" placeholder="Dirección" required>
             </div>
 
+            <!-- Correo -->
             <div class="mb-3">
                 <label for="correo" class="form-label">Correo electrónico:</label>
-                <input type="text" maxlength="50" th:field="*{correo}" class="form-control" placeholder="E-Mail">
+                <input type="email" maxlength="50" th:field="*{correo}" class="form-control" placeholder="Correo" required>
             </div>
 
+            <!-- Contraseña -->
             <div class="mb-3">
                 <label for="contrasena" class="form-label">Contraseña:</label>
-                <input type="text" maxlength="255" th:field="*{contrasena}" class="form-control" placeholder="Contraseña">
+                <input type="password" minlength="3" maxlength="255" th:field="*{contrasena}" class="form-control" placeholder="Contraseña (mínimo 6 caracteres)" required>
             </div>
-
 
             <!-- Departamento -->
             <div class="mb-3">
                 <label for="departamento" class="form-label">Departamento:</label>
-                <select id="departamento" name="departamento" class="form-select">
+                <select id="departamento" name="departamento" class="form-select" required>
                     <option value="">Seleccione departamento</option>
                     <option th:each="dep : ${departamentos}"
                             th:value="${dep.id}"
@@ -61,7 +71,7 @@
             <!-- Provincia -->
             <div class="mb-3">
                 <label for="provincia" class="form-label">Provincia:</label>
-                <select id="provincia" name="provincia" class="form-select">
+                <select id="provincia" name="provincia" class="form-select" required>
                     <option value="">Seleccione provincia</option>
                 </select>
             </div>
@@ -69,18 +79,23 @@
             <!-- Distrito -->
             <div class="mb-3">
                 <label for="distrito" class="form-label">Distrito:</label>
-                <select id="distrito" th:field="*{persona.ubigeo.id}" name="distrito" class="form-select">
+                <select id="distrito" th:field="*{persona.ubigeo.id}" name="distrito" class="form-select" required>
                     <option value="">Seleccione distrito</option>
                 </select>
             </div>
 
-            <!-- Checkboxes roles-->
-            <h3>Deseo registrarme como: </h3>
-            <input type="checkbox" th:field="*{cliente}" id="cliente" />
-            <label for="esCliente">Cliente</label>
-
-            <input type="checkbox" th:field="*{tecnico}" id="tecnico" />
-            <label for="esTecnico">Técnico (requerirá verificación posterior)</label>
+            <!-- Roles -->
+            <div class="mb-3">
+                <h5>Deseo registrarme como: </h5>
+                <div class="form-check">
+                    <input type="checkbox" th:field="*{cliente}" id="cliente" class="form-check-input"/>
+                    <label for="cliente" class="form-check-label">Cliente</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" th:field="*{tecnico}" id="tecnico" class="form-check-input"/>
+                    <label for="tecnico" class="form-check-label">Técnico (requerirá verificación posterior)</label>
+                </div>
+            </div>
 
             <!-- Botón -->
             <button type="submit" class="btn btn-primary">Registrar</button>
@@ -89,11 +104,9 @@
 
     <!-- Scripts -->
     <script>
-
-        /* listener del select <departamento> para actualizar <provincia>*/
         document.getElementById("departamento").addEventListener("change", function () {
             const deptId = this.value;
-            fetch(`/api/provincia/listarPorDepartamento?departmentId=${deptId}`) /*fetch api*/
+            fetch(`/api/provincia/listarPorDepartamento?departmentId=${deptId}`)
                 .then(res => res.json())
                 .then(data => {
                     const provinciaSelect = document.getElementById("provincia");
@@ -101,12 +114,10 @@
                     data.forEach(p => {
                         provinciaSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
                     });
-                    //Limpiar distritos
                     document.getElementById("distrito").innerHTML = '<option value="">Seleccione distrito</option>';
                 });
         });
 
-        /*lo mismo, pero para provincia-distrito*/
         document.getElementById("provincia").addEventListener("change", function () {
             const provId = this.value;
             fetch(`/api/distrito/listarPorProvincia?provinceId=${provId}`)

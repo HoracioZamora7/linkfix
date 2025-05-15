@@ -56,35 +56,51 @@ public class UsuarioController {
     @PostMapping("/registro")
     public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario)
     {
-        personaService.save(usuario.getPersona());
-        usuario.setEstado(estadoService.findById(1)); //activo
-        usuarioService.save(usuario);
+        try {
+            
+            if(usuario.isCliente()==false && usuario.isTecnico()==false)
+            {
+                return "redirect:/index?error=2";
+            }                           
+            personaService.save(usuario.getPersona());
+            usuario.setEstado(estadoService.findById(1)); //activo
+            usuarioService.save(usuario);
+            
+            //System.out.println("Cliente: " + usuario.isCliente() + ", Técnico: " + usuario.isTecnico());
+            if(usuario.isCliente())
+            {
+                UsuarioRolEntity clienterol = new UsuarioRolEntity(); 
+                clienterol.setUsuario(usuario);
+                clienterol.setRol(rolService.findById(2)); //rol cliente
+                usuarioRolSevice.save(clienterol);
+            }
+
+            if(usuario.isTecnico())
+            {
+                UsuarioRolEntity clienterol = new UsuarioRolEntity();
+                clienterol.setUsuario(usuario);
+                clienterol.setRol(rolService.findById(3)); //rol tecnico
+                usuarioRolSevice.save(clienterol);
+
+                usuario.setEstado(estadoService.findById(3)); //pendiente
+                usuarioService.update(usuario);
+
+                SolicitudRegistroEntity solicitudRegistro = new SolicitudRegistroEntity();
+
+                //crear solicitud de registro
+                solicitudRegistro.setTecnico(usuario);
+                solicitudRegistroService.save(solicitudRegistro);
+                return "redirect:/index?error=3";
+            }
         
-        if(usuario.isCliente())
-        {
-            UsuarioRolEntity clienterol = new UsuarioRolEntity(); 
-            clienterol.setUsuario(usuario);
-            clienterol.setRol(rolService.findById(2)); //rol cliente
-            usuarioRolSevice.save(clienterol);
-        }
 
-        if(usuario.isTecnico())
-        {
-            UsuarioRolEntity clienterol = new UsuarioRolEntity();
-            clienterol.setUsuario(usuario);
-            clienterol.setRol(rolService.findById(3)); //rol tecnico
-            usuarioRolSevice.save(clienterol);
-
-            usuario.setEstado(estadoService.findById(3)); //pendiente
-            usuarioService.update(usuario);
-
-            SolicitudRegistroEntity solicitudRegistro = new SolicitudRegistroEntity();
-
-            //crear solicitud de registro
-            solicitudRegistro.setTecnico(usuario);
-            solicitudRegistroService.save(solicitudRegistro);
-        }
         return "redirect:/index";
+
+        } catch (Exception e) {
+            e.printStackTrace(); //cambiar por looger en el futuro 
+            return "redirect:/index?error=1";
+        }
+       
     }
 
     @PostMapping("/login")

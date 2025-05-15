@@ -15,7 +15,7 @@
     <form method="get" action="#" th:action="@{/solicitudes/lista}" style="margin-bottom: 15px;">
         <label for="estadoFilter">Filtrar por estado:</label>
         <select name="estado" id="estadoFilter">
-            <option th:selected="${estado == null}">Todos</option>
+            <option th:selected="${estado == null}">Seleccionar</option>
             <option th:value="true" th:selected="${estado == 'true'}">Aprobado</option>
             <option th:value="false" th:selected="${estado == 'false'}">Pendiente</option>
         </select>
@@ -44,7 +44,7 @@
                 <td th:text="${solicitud.tecnico.persona.nombre}"></td>
                 <td th:text="${#temporals.format(solicitud.fecha_registro, 'yyyy-MM-dd HH:mm')}"></td>
                 <td th:text="${solicitud.fecha_revision != null ? #temporals.format(solicitud.fecha_revision, 'yyyy-MM-dd HH:mm') : '-'}"></td>
-                <td th:text="${solicitud.estado ? 'Aprobado' : 'Pendiente'}"></td>
+                <td th:text="${solicitud.estado ? 'Revisado' : 'Pendiente'}"></td>
                 <td th:text="${solicitud.administrador != null ? solicitud.administrador.correo : '-'}"></td>
                 <td>
                     <a th:href="@{'/solicitudes/detalle/' + ${solicitud.id}}">Detalle</a>

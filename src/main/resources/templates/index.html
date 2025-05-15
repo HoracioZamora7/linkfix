@@ -18,9 +18,17 @@
           <div class="card-footer">
             <a th:href="@{/login}" class="btn btn-secondary">Iniciar Sesión</a>
           </div>
+
+          <div th:if="${error}" style="color: red;">
+            <p th:text="${error}"></p>
+          </div>
+          <div th:if="${aviso}" style="color: green;">
+            <p th:text="${aviso}"></p>
+          </div>
         </div>
       </div>
     </div>
+    
 
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

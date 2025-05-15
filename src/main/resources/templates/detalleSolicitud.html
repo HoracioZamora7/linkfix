@@ -30,6 +30,7 @@
         <p><label>Correo:</label> <span th:text="${solicitud.tecnico.correo}"></span></p>
         <p><label>Nombre:</label> <span th:text="${solicitud.tecnico.persona.nombre} + ' ' + ${solicitud.tecnico.persona.apellidos}"></span></p>
         <p><label>DNI:</label> <span th:text="${solicitud.tecnico.persona.dni}"></span></p>
+        <p><label>Número de teléfono:</label> <span th:text="${solicitud.tecnico.persona.telefono}"></span></p>
         <p><label>Fecha de Registro:</label> <span th:text="${solicitud.fecha_registro}"></span></p>
         <p><label>Estado Usuario:</label> <span th:text="${solicitud.tecnico.estado.nombre}"></span></p>
     </div>
