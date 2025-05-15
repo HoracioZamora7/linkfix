@@ -7,6 +7,7 @@ import java.util.Date;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -44,7 +45,7 @@ public class UsuarioEntity implements Serializable{
     private EstadoEntity estado;
 
     @Column(name = "fecha_registro")
-    private Date fecha_registro;
+    private LocalDateTime fecha_registro;
 
     @Transient
     private boolean tecnico;

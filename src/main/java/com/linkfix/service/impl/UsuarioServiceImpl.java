@@ -1,5 +1,6 @@
 package com.linkfix.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,23 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioEntity save(UsuarioEntity u) 
     {
         u.setContrasena(passwordEncoder.encode(u.getContrasena()));
+        u.setFecha_registro(LocalDateTime.now());
+        return repository.save(u);
+    }
+
+    @Override//
+    public UsuarioEntity update(UsuarioEntity u) {
+        /* u.setContrasena(passwordEncoder.encode(u.getContrasena())); */ //solo para update de contraseñas
         return repository.save(u);
     }
 
     @Override
-    public UsuarioEntity update(UsuarioEntity u) {
-        u.setContrasena(passwordEncoder.encode(u.getContrasena()));
-        return repository.save(u);
+    public UsuarioEntity findByCorreo(String c) {
+        return repository.findByCorreo(c);
+    }
+
+    @Override
+    public UsuarioEntity findById(Long id) {
+        return repository.findById(id).orElse(null);
     }
 }

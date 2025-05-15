@@ -7,6 +7,7 @@ use linkfix;
 /*creacion tablas*/
 
 
+
 /*persona*/
 create table Persona
 (
@@ -86,7 +87,8 @@ create table Solicitud_registro
 	id bigint auto_increment,
 	idTecnico bigint unique not null,
 	fecha DATETIME default NOW(),
-	idAprobadoPor bigint not null,	
+	idAprobadoPor bigint not null,
+	comentario varchar(120),
 	primary key (id)
 );
 

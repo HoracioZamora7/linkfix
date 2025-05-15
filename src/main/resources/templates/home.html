@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Inicio - Home</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <h1>Bienvenido al sistema</h1>
+
+    <!-- Mostrar el correo y roles del usuario logueado -->
+    <div th:if="${session.logueado != null}">
+        <p>Usuario: <b th:text="${session.logueado.correo}">correo@ejemplo.com</b></p>
+        <p>Roles:
+            <ul>
+                <li th:each="rol : ${session.logueado.roles}" th:text="${rol}">Rol</li>
+            </ul>
+        </p>
+
+        <!-- Mostrar enlace solo si el usuario tiene rol con id 1 : Administrador  -->
+        <a th:if="${session.logueado != null and session.logueado.roles.contains(1)}" th:href="@{/solicitudes/lista}">Validar Técnicos</a>
+
+
+    </div>
+
+    <div th:if="${session.logueado == null}">
+        <p>Sesión no valida</p>
+        <a th:href="@{/login}">Iniciar sesión</a>
+    </div>
+
+    <form th:action="@{/logout}" method="post">
+        <button type="submit">Cerrar sesión (sin implementar)</button>
+    </form>
+
+</body>
+</html>

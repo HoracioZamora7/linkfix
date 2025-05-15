@@ -93,7 +93,7 @@
         /* listener del select <departamento> para actualizar <provincia>*/
         document.getElementById("departamento").addEventListener("change", function () {
             const deptId = this.value;
-            fetch(`/api/provincia/listarPorDepartamento?departmentId=${deptId}`)
+            fetch(`/api/provincia/listarPorDepartamento?departmentId=${deptId}`) /*fetch api*/
                 .then(res => res.json())
                 .then(data => {
                     const provinciaSelect = document.getElementById("provincia");
@@ -101,7 +101,7 @@
                     data.forEach(p => {
                         provinciaSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
                     });
-                    // Limpiar distritos
+                    //Limpiar distritos
                     document.getElementById("distrito").innerHTML = '<option value="">Seleccione distrito</option>';
                 });
         });

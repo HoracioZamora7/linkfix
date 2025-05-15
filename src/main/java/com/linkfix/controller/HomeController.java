@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.service.DepartamentoService;
-import com.linkfix.service.UsuarioService;
+import com.linkfix.service.SolicitudRegistroService;
 
 @Controller
 public class HomeController {
@@ -20,13 +20,16 @@ public class HomeController {
     @Autowired
     private DepartamentoService deptService;
 
-    @GetMapping("/registrar")
+    @Autowired
+    private SolicitudRegistroService solicitudService;
+
+    @GetMapping("/registro")
     public String mostrarRegistro(Model model)
     { 
         UsuarioEntity usuario = new UsuarioEntity();
         model.addAttribute("usuario", usuario);
         model.addAttribute("departamentos", deptService.findAll());
-        return "registrar";
+        return "registro";
     }
 
     @GetMapping("/index")
@@ -34,5 +37,18 @@ public class HomeController {
     { 
         return "index";
     }
+
+    @GetMapping("/login")
+    public String mostrarLogin(Model model)
+    { 
+        return "login";
+    }
+
+    /* @GetMapping("validarTecnicos")
+    public String mostrarValidarTecnicos(Model model)
+    {
+        model.addAttribute("listaSolicitudes", solicitudService.findAll());
+        return "validarTecnicos";
+    } */
 
 }
