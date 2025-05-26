@@ -51,7 +51,7 @@ public class SolicitudRegistroController {
 
         model.addAttribute("solicitudes", solicitudes);
         model.addAttribute("estado", estado);//y esto
-        return "validarTecnicos";
+        return "solicitudes_de_registro/lista";
     }
 
 
@@ -63,10 +63,10 @@ public class SolicitudRegistroController {
 
         SolicitudRegistroEntity solicitud = solicitudRegistroService.findById(id);
         if (solicitud == null) {
-            return "redirect:/validarTecnicos";
+            return "redirect:/solicitudes_de_registro/lista";
         }
         model.addAttribute("solicitud", solicitud);
-        return "detalleSolicitud";  //crear carpeta para separar todos estos
+        return "solicitudes_de_registro/detalle";  //crear carpeta para separar todos estos
     }
 
 
