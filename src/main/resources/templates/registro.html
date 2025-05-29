@@ -123,7 +123,7 @@
                 });
         });
 
-            < !--Al cambiar provincia, cargar distritos-- >
+            /*<!--Al cambiar provincia, cargar distritos-->*/
             document.getElementById("provincia").addEventListener("change", function () {
                 const provId = this.value;
                 fetch(`/api/distrito/listarPorProvincia?provinceId=${provId}`)
