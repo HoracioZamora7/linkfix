@@ -1,5 +1,6 @@
 package com.linkfix.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -19,4 +20,14 @@ public class UsuarioDTO {
     private String apellidos;
     private String correo;
     private List<Integer> roles;
+    private String dni;
+    private String direccion;
+    private String ubigeo;
+    private String departamento;
+    private String provincia;
+    private String distrito;
+    private float calificacion;
+    private LocalDateTime fecha_registro;
+    private String telefono;
 }
+

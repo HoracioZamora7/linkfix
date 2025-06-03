@@ -3,8 +3,6 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
-import java.util.Date;
-
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;

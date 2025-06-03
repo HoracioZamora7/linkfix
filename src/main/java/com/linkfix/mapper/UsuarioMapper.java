@@ -15,6 +15,12 @@ public class UsuarioMapper {
         dto.setCorreo(usuario.getCorreo());
         dto.setNombre(usuario.getPersona().getNombre());
         dto.setApellidos(usuario.getPersona().getApellidos());
+        dto.setDni(usuario.getPersona().getDni());
+        dto.setDireccion(usuario.getPersona().getDireccion());
+        dto.setUbigeo(usuario.getPersona().getUbigeo().getId());
+        dto.setCalificacion(usuario.getCalificacion());
+        dto.setFecha_registro(usuario.getFecha_registro());
+        dto.setTelefono(usuario.getPersona().getTelefono());
         
         List<Integer> rolesId = roles.stream()
                                     .map(RolEntity::getId)
