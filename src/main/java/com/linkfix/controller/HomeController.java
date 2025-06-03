@@ -1,17 +1,13 @@
 package com.linkfix.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.service.DepartamentoService;
-import com.linkfix.service.SolicitudRegistroService;
 
 @Controller
 public class HomeController {
@@ -21,9 +17,6 @@ public class HomeController {
 
     @Autowired
     private DepartamentoService deptService;
-
-    @Autowired
-    private SolicitudRegistroService solicitudService;
 
     @GetMapping("/registro")
     public String mostrarRegistro(Model model)
