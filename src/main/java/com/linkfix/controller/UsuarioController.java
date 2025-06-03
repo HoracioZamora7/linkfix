@@ -172,7 +172,7 @@ public class UsuarioController {
                 return "redirect:/index?error=4";//sesion no valida
             } 
             else{
-                
+                /* manejar logica de update */
             }
         
         } 
