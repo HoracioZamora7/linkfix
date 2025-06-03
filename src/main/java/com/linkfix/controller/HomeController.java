@@ -36,14 +36,36 @@ public class HomeController {
 
     @GetMapping("/index")
     public String mostrarIndex(@RequestParam(value = "error", required = false) String error, Model model)
-    { 
-        if ("1".equals(error)){
-            model.addAttribute("error", "Datos inválidos al intentar crear cuenta");
-        } else if("2".equals(error)){
-            model.addAttribute("error", "Debes seleccionar, por lo menos, un rol!");
-        }else if("3".equals(error)){
-            model.addAttribute("aviso", "Cuenta pendiente de aprobacion!");
+    {
+        if (error != null) {
+            String tipoMensaje = null, mensaje = null;
+
+            switch (error) {
+                case "1":
+                    tipoMensaje = "error";
+                    mensaje = "Datos inválidos al intentar crear cuenta";
+                    break;
+                case "2":
+                    tipoMensaje = "error";
+                    mensaje = "Debes seleccionar, por lo menos, un rol!";
+                    break;
+                case "3":
+                    tipoMensaje = "aviso";
+                    mensaje = "Cuenta pendiente de aprobación!";
+                    break;
+                case "4":
+                    tipoMensaje = "error";
+                    mensaje = "Sesión inválida";
+                    break;
+                default:
+                    tipoMensaje = "error";
+                    mensaje = "Hubo un error";
+                    break;
+            }
+            
+            model.addAttribute(tipoMensaje, mensaje);
         }
+
         return "index";
     }
 

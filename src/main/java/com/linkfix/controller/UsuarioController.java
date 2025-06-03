@@ -1,17 +1,15 @@
 package com.linkfix.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.linkfix.dto.UsuarioDTO;
-import com.linkfix.entity.RolEntity;
 import com.linkfix.entity.SolicitudRegistroEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.entity.UsuarioRolEntity;
@@ -50,8 +48,12 @@ public class UsuarioController {
     @Autowired 
     private SolicitudRegistroService solicitudRegistroService;
 
-/*     @Transient
-    private List<String> rolesSeleccionados; */
+    private boolean isAdmin(HttpSession session) 
+    {
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+        return usuarioDTO != null && usuarioDTO.getRoles().contains(1); //si contiene el rol 1 (admin)
+    }
+
 
     @PostMapping("/registro")
     public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario)
@@ -127,4 +129,60 @@ public class UsuarioController {
         return "login";
         
     }
+
+
+
+
+
+    ///zamora 
+    @GetMapping("/perfil")
+    public String verPerfil(HttpSession session, Model model) {     
+
+        if (session.getAttribute("logueado") == null){
+            return "redirect:/index?error=4";//sesion no valida
+        }
+        else{
+            UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("logueado");
+            model.addAttribute("usuario", usuario);
+        }
+
+        return "/usuario/perfil";
+    }
+
+    @GetMapping("/perfil/editar")
+    public String editarPerfil(HttpSession session, Model model) {     
+
+        if (session.getAttribute("logueado") == null){
+            return "redirect:/index?error=4";//sesion no valida
+        }
+        else{
+            UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+            model.addAttribute("usuario", usuarioDTO);
+        }
+
+        return "/usuario/perfil";
+    }
+
+    @PostMapping("/perfil/editar")
+    public String guardarCambios(HttpSession session, @ModelAttribute("usuario") UsuarioDTO usuarioDTO)
+    {
+
+        try {
+            if (session.getAttribute("logueado") == null){
+                return "redirect:/index?error=4";//sesion no valida
+            } 
+            else{
+                
+            }
+        
+        } 
+        catch (Exception e) {
+            e.printStackTrace(); //cambiar por looger en el futuro 
+            return "redirect:/index?error=1";
+        }
+        
+        
+        return "redirect:/perfil";
+    }
+
 }

@@ -37,7 +37,7 @@ public class SolicitudRegistroController {
     public String listarSolicitudes(@RequestParam(required = false) String estado, Model model, HttpSession session) {
         if (!isAdmin(session)) {
             model.addAttribute("error", "Funcion exclusiva para admins");
-            return "redirect:/login"; //agregar mensaje de error y ocultar sessionid dela url
+            return "redirect:/home"; //agregar mensaje de error y ocultar sessionid dela url
 
         }
         List<SolicitudRegistroEntity> solicitudes;
