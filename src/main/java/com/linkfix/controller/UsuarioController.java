@@ -1,28 +1,19 @@
 package com.linkfix.controller;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import com.linkfix.dto.UsuarioDTO;
+import com.linkfix.dto.DniResponse;
 import com.linkfix.entity.SolicitudRegistroEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.entity.UsuarioRolEntity;
 import com.linkfix.mapper.UsuarioMapper;
-import com.linkfix.service.EstadoService;
-import com.linkfix.service.PersonaService;
-import com.linkfix.service.RolService;
-import com.linkfix.service.SolicitudRegistroService;
-import com.linkfix.service.UsuarioRolService;
-import com.linkfix.service.UsuarioService;
-
+import com.linkfix.service.*;
 import jakarta.servlet.http.HttpSession;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @Controller
 public class UsuarioController {
@@ -45,84 +36,105 @@ public class UsuarioController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired 
+    @Autowired
     private SolicitudRegistroService solicitudRegistroService;
 
-/*     @Transient
-    private List<String> rolesSeleccionados; */
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Value("${api.token}")
+    private String apiToken;
 
     @PostMapping("/registro")
-    public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario)
-    {
+    public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario, Model model) {
         try {
-            
-            if(usuario.isCliente()==false && usuario.isTecnico()==false)
-            {
-                return "redirect:/index?error=2";
-            }                           
+            String dni = usuario.getPersona().getDni();
+
+            // Validar formato DNI
+         /*    if (dni == null || dni.length() != 8 || !dni.matches("\\d+")) {
+                model.addAttribute("error", "El DNI ingresado no es válido.");
+                return "registro"; // Asegúrate que este es el nombre del archivo .html del formulario
+            }
+ */
+            // Llamar a la API externa para obtener los nombres
+            String url = "https://apiperu.dev/api/dni/" + dni + "?api_token=" + apiToken;
+            DniResponse response = restTemplate.getForObject(url, DniResponse.class);
+
+            if (response == null || !response.isSuccess() || response.getData() == null) {
+                model.addAttribute("error", "No se encontraron nombres para el DNI ingresado.");
+                return "index";
+            }
+
+            // Cargar nombres y apellidos en el objeto Persona
+        String nombre = response.getData().getNombre();
+        String apellidos = response.getData().getApellidos();
+        System.out.println("datos: " + response.getData().getNombre());
+
+        usuario.getPersona().setNombre(nombre);
+        usuario.getPersona().setApellidos(apellidos);
+            // Validar roles seleccionados
+            if (!usuario.isCliente() && !usuario.isTecnico()) {
+                model.addAttribute("error", "Debe seleccionar al menos un rol.");
+                return "index";
+            }
+
             personaService.save(usuario.getPersona());
-            usuario.setEstado(estadoService.findById(1)); //activo
+            usuario.setEstado(estadoService.findById(1)); // Activo
             usuarioService.save(usuario);
-            
-            //System.out.println("Cliente: " + usuario.isCliente() + ", Técnico: " + usuario.isTecnico());
-            if(usuario.isCliente())
-            {
-                UsuarioRolEntity clienterol = new UsuarioRolEntity(); 
+
+            if (usuario.isCliente()) {
+                UsuarioRolEntity clienterol = new UsuarioRolEntity();
                 clienterol.setUsuario(usuario);
-                clienterol.setRol(rolService.findById(2)); //rol cliente
+                clienterol.setRol(rolService.findById(2)); // Cliente
                 usuarioRolSevice.save(clienterol);
             }
 
-            if(usuario.isTecnico())
-            {
-                UsuarioRolEntity clienterol = new UsuarioRolEntity();
-                clienterol.setUsuario(usuario);
-                clienterol.setRol(rolService.findById(3)); //rol tecnico
-                usuarioRolSevice.save(clienterol);
+            if (usuario.isTecnico()) {
+                UsuarioRolEntity tecnicorol = new UsuarioRolEntity();
+                tecnicorol.setUsuario(usuario);
+                tecnicorol.setRol(rolService.findById(3)); // Técnico
+                usuarioRolSevice.save(tecnicorol);
 
-                usuario.setEstado(estadoService.findById(3)); //pendiente
+                usuario.setEstado(estadoService.findById(3)); // Pendiente
                 usuarioService.update(usuario);
 
                 SolicitudRegistroEntity solicitudRegistro = new SolicitudRegistroEntity();
-
-                //crear solicitud de registro
                 solicitudRegistro.setTecnico(usuario);
                 solicitudRegistroService.save(solicitudRegistro);
-                return "redirect:/index?error=3";
-            }
-        
 
-        return "redirect:/index";
+                model.addAttribute("error", "Registro enviado, pendiente de aprobación.");
+                return "index";
+            }
+
+            model.addAttribute("error", "Usuario registrado correctamente.");
+            return "index";
 
         } catch (Exception e) {
-            e.printStackTrace(); //cambiar por looger en el futuro 
-            return "redirect:/index?error=1";
+            e.printStackTrace(); // Mejor reemplazar por Logger
+            model.addAttribute("error", "Ocurrió un error durante el registro.");
+            return "index";
         }
-       
     }
 
     @PostMapping("/login")
-    public String login(@RequestParam("correo") String correo,  @RequestParam("contrasena") String contrasena,  HttpSession session,  Model model) 
-    {
-        //llevar gran parte de esto al service
+    public String login(@RequestParam("correo") String correo,
+                        @RequestParam("contrasena") String contrasena,
+                        HttpSession session,
+                        Model model) {
+
         UsuarioEntity usuario = usuarioService.findByCorreo(correo);
-    
-        //si el usuario tiene el estado "Activo"...
-        if(usuario.getEstado().getId() == 1) {
-            if (usuario != null && passwordEncoder.matches(contrasena, usuario.getContrasena())) {
-                UsuarioDTO usuarioDTO = UsuarioMapper.toSessionUsuarioDTO(usuario, usuarioRolSevice.findRolesByUsuario(usuario));
-                session.setAttribute("logueado", usuarioDTO);  //que se pone en el atributo string?
-                return "redirect:/home";
+
+        if (usuario != null && usuario.getEstado().getId() == 1) {
+            if (passwordEncoder.matches(contrasena, usuario.getContrasena())) {
+                session.setAttribute("logueado", UsuarioMapper.toSessionUsuarioDTO(usuario, usuarioRolSevice.findRolesByUsuario(usuario)));
+                return "home";
+            } else {
+                model.addAttribute("error", "Correo o contraseña incorrectos.");
             }
-            else{
-                model.addAttribute("error", "Correo o contraseña incorrectos");
-            }
-        }
-        else{
-            model.addAttribute("error", "Cuenta pendiente de aprobación. Por favor inténtelo más tarde"); //añadir un caso por cada estado...
+        } else {
+            model.addAttribute("error", "Cuenta pendiente de aprobación o no activa.");
         }
 
         return "login";
-        
     }
 }
