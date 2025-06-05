@@ -21,18 +21,6 @@
         <!-- Formulario con enlace al controlador POST /registro -->
         <form th:action="@{/registro}" th:object="${usuario}" method="post">
 
-            <!-- Campo: Nombre -->
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre:</label>
-                <input type="text" maxlength="50" th:field="*{persona.nombre}" class="form-control" required>
-            </div>
-
-            <!-- Campo: Apellidos -->
-            <div class="mb-3">
-                <label for="apellidos" class="form-label">Apellidos:</label>
-                <input type="text" maxlength="50" th:field="*{persona.apellidos}" class="form-control" required>
-            </div>
-
             <!-- Campo: DNI (8 dígitos numéricos) -->
             <div class="mb-3">
                 <label for="dni" class="form-label">DNI:</label>
