@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.service.DepartamentoService;
@@ -28,37 +27,8 @@ public class HomeController {
     }
 
     @GetMapping("/index")
-    public String mostrarIndex(@RequestParam(value = "error", required = false) String error, Model model)
-    {
-        if (error != null) {
-            String tipoMensaje = null, mensaje = null;
-
-            switch (error) {
-                case "1":
-                    tipoMensaje = "error";
-                    mensaje = "Datos inválidos al intentar crear cuenta";
-                    break;
-                case "2":
-                    tipoMensaje = "error";
-                    mensaje = "Debes seleccionar, por lo menos, un rol!";
-                    break;
-                case "3":
-                    tipoMensaje = "aviso";
-                    mensaje = "Cuenta pendiente de aprobación!";
-                    break;
-                case "4":
-                    tipoMensaje = "error";
-                    mensaje = "Sesión inválida";
-                    break;
-                default:
-                    tipoMensaje = "error";
-                    mensaje = "Hubo un error";
-                    break;
-            }
-            
-            model.addAttribute(tipoMensaje, mensaje);
-        }
-
+    public String mostrarIndex(Model model)
+    { 
         return "index";
     }
 
@@ -67,12 +37,4 @@ public class HomeController {
     { 
         return "login";
     }
-
-    /* @GetMapping("validarTecnicos")
-    public String mostrarValidarTecnicos(Model model)
-    {
-        model.addAttribute("listaSolicitudes", solicitudService.findAll());
-        return "validarTecnicos";
-    } */
-
 }
