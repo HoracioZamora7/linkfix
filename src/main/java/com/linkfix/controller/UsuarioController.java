@@ -183,7 +183,7 @@ public class UsuarioController {
 
         if (session.getAttribute("logueado") == null){
             redirectAttributes.addFlashAttribute("sesion inválida");
-            return "redirect:/index?error=4";//sesion no valida
+            return "redirect:/index";//sesion no valida
         }
         else{
             UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("logueado");
@@ -198,7 +198,7 @@ public class UsuarioController {
 
         if (session.getAttribute("logueado") == null){
             redirectAttributes.addFlashAttribute("sesion inválida");
-            return "redirect:/index?error=4";//sesion no valida
+            return "redirect:/index";//sesion no valida
         }
         else{
             UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
@@ -209,23 +209,26 @@ public class UsuarioController {
     }
 
     @PostMapping("/perfil/editar")
-    public String guardarCambios(HttpSession session, @ModelAttribute("usuario") UsuarioDTO usuarioDTO)
+    public String guardarCambios(HttpSession session, @ModelAttribute("usuario") UsuarioDTO usuarioDTO, RedirectAttributes redirectAttributes)
     {
 
         try {
             if (session.getAttribute("logueado") == null){
-                return "redirect:/index?error=4";//sesion no valida
+                redirectAttributes.addFlashAttribute("sesion inválida");
+                return "redirect:/index";//sesion no valida
             } 
             else{
-                
+                /* manejar logica de update */
             }
         
         } 
         catch (Exception e) {
             e.printStackTrace(); //cambiar por looger en el futuro 
-            return "redirect:/index?error=1";
+            redirectAttributes.addFlashAttribute("Error inesperado");
+            return "redirect:/index";//sesion no valida
         }
         
+
         return "redirect:/perfil";
     }
 
