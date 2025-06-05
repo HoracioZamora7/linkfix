@@ -228,7 +228,7 @@ public class UsuarioController {
             return "redirect:/index";//sesion no valida
         }
         
-        
+
         return "redirect:/perfil";
     }
 
