@@ -226,6 +226,7 @@ public class UsuarioController {
             return "redirect:/index?error=1";
         }
         
+        
         return "redirect:/perfil";
     }
 
