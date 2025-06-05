@@ -61,8 +61,8 @@ create table Disponibilidad
 	id bigint auto_increment,
 	idTecnico bigint not null,
 	idDia int not null,
-	hora_inicio time DEFAULT '00:00:00',
-	hora_fin time DEFAULT '23:59:59',
+	horaInicio time,
+	horaFin time,
 	primary key (id)
 );
 /*Electrodomestico*/
@@ -81,14 +81,16 @@ create table Especialidad
 	primary key (id)
 );
 
-/*Solicitud_registro*/
-create table Solicitud_registro
+/*SolicitudRegistro*/
+create table SolicitudRegistro
 (
 	id bigint auto_increment,
 	idTecnico bigint unique not null,
-	fecha DATETIME default NOW(),
-	idAprobadoPor bigint not null,
+	fecha_registro DATETIME default NOW(),
+	fecha_revision DATETIME,
+	idAdmin bigint,
 	comentario varchar(120),
+	estado bit,
 	primary key (id)
 );
 
@@ -2354,12 +2356,12 @@ foreign key (idTecnico) references Usuario(id);
 alter table Especialidad add constraint fk_especialidad_electro
 foreign key (idElectrodomestico) references Electrodomestico(id);
 
--- Solicitud_registro -> Usuario (idTecnico y AprobadoPor)
-alter table Solicitud_registro add constraint fk_solicitud_tecnico
+-- SolicitudRegistro -> Usuario (idTecnico y AprobadoPor)
+alter table SolicitudRegistro add constraint fk_solicitud_tecnico
 foreign key (idTecnico) references Usuario(id);
 
-alter table Solicitud_registro add constraint fk_solicitud_admin
-foreign key (idAprobadoPor) references Usuario(id);
+alter table SolicitudRegistro add constraint fk_solicitud_admin
+foreign key (idAdmin) references Usuario(id);
 
 -- Servicio -> Usuario (cliente y técnico), Electrodomestico, Estado
 alter table Servicio add constraint fk_servicio_cliente
@@ -2392,3 +2394,6 @@ insert into rol(nombre) values('Administrador'),('Cliente'),('Técnico');
 
 /*estados usuario*/
 insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente'), ('Rechazado');
+
+
+insert into dia(nombre) values ('Lunes'), ('Martes'), ('Miercoles'), ('Jueves'), ('Viernes'), ('Sábado'), ('Domingo')

@@ -3,11 +3,8 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
-import java.util.Date;
-
 import jakarta.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -32,9 +29,9 @@ public class DisponibilidadEntity {
     @JoinColumn(name = "idDia")
     private DiaEntity dia;
 
-    @Column(name = "hora_inicio")
-    private LocalDateTime hora_inicio;
+    @Column(name = "horaInicio")
+    private LocalTime horaInicio;
 
-    @Column(name = "hora_fin")
-    private LocalDateTime hora_fin;
+    @Column(name = "horaFin")
+    private LocalTime horaFin;
 }

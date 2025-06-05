@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.linkfix.entity.DiaEntity;
 
 @Repository
-public interface DiaRepository extends JpaRepository<DiaEntity, Long> {
+public interface DiaRepository extends JpaRepository<DiaEntity, Integer> {
 
 
 

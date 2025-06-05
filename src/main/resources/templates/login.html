@@ -21,6 +21,11 @@
                         <div th:if="${error}" class="alert alert-danger" role="alert">
                             <p class="mb-0" th:text="${error}">Credenciales inválidas</p>
                         </div>
+                        <div th:if="${error}" class="alert alert-danger" role="alert">
+                            <p class="mb-0" th:text="${mensaje}"></p>
+                        </div>
+                        
+                        
 
                         <!-- Formulario de login -->
                         <form th:action="@{/login}" method="post">

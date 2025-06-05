@@ -3,11 +3,13 @@ package com.linkfix.service.impl;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.linkfix.entity.ElectrodomesticoEntity;
 import com.linkfix.repository.ElectrodomesticoRepository;
 import com.linkfix.service.ElectrodomesticoService;
 
+@Service
 public class ElectrodomesticoServiceImpl implements ElectrodomesticoService {
 
     @Autowired

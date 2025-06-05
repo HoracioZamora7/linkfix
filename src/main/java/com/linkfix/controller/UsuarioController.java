@@ -1,5 +1,9 @@
 package com.linkfix.controller;
 
+import java.sql.Time;
+import java.time.LocalTime;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +18,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.linkfix.dto.DniResponse;
 import com.linkfix.dto.UsuarioDTO;
+import com.linkfix.entity.DiaEntity;
+import com.linkfix.entity.DisponibilidadEntity;
 import com.linkfix.entity.SolicitudRegistroEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.entity.UsuarioRolEntity;
 import com.linkfix.mapper.UsuarioMapper;
+import com.linkfix.service.DepartamentoService;
+import com.linkfix.service.DiaService;
+import com.linkfix.service.DisponibilidadService;
 import com.linkfix.service.EstadoService;
 import com.linkfix.service.PersonaService;
 import com.linkfix.service.RolService;
@@ -53,8 +62,20 @@ public class UsuarioController {
     @Autowired 
     private SolicitudRegistroService solicitudRegistroService;
 
+    @Autowired 
+    private DepartamentoService deptService;
+
+
     @Autowired
     private RestTemplate restTemplate;
+    
+    @Autowired
+    private DisponibilidadService disponibilidadService;
+
+    @Autowired
+    private DiaService diaService;
+
+    /*  */
 
     private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 
@@ -149,14 +170,18 @@ public class UsuarioController {
     {
         //llevar gran parte de esto al service
         UsuarioEntity usuario = usuarioService.findByCorreo(correo);
+        if(usuario==null){
+            model.addAttribute("error", "Correo no registrado.");
+            return "login";
+        }
     
         //si el usuario tiene el estado...
         switch (usuario.getEstado().getId()) {
             //activo
             case 1:
                 if(passwordEncoder.matches(contrasena, usuario.getContrasena())) {
-                    UsuarioDTO usuarioDTO = UsuarioMapper.toSessionUsuarioDTO(usuario, usuarioRolSevice.findRolesByUsuario(usuario));
-                    session.setAttribute("logueado", usuarioDTO);
+                    UsuarioDTO usuarioDTO = usuarioService.toSessionUsuarioDTO(usuario, usuarioRolSevice.findRolesByUsuario(usuario));
+                    session.setAttribute("logueado", usuarioDTO);//variable sesion
                     return "redirect:/home";
                 }
                 else{
@@ -182,12 +207,16 @@ public class UsuarioController {
     public String verPerfil(HttpSession session, Model model, RedirectAttributes redirectAttributes) {     
 
         if (session.getAttribute("logueado") == null){
-            redirectAttributes.addFlashAttribute("sesion inválida");
+            redirectAttributes.addFlashAttribute("error", "sesión inválida");
             return "redirect:/index";//sesion no valida
         }
         else{
-            UsuarioDTO usuario = (UsuarioDTO) session.getAttribute("logueado");
-            model.addAttribute("usuario", usuario);
+            UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+            //consultar disponibilidad (lista)
+            List<DisponibilidadEntity> disponibilidad = disponibilidadService.findByIdTecnico(usuarioDTO.getId()).orElse(null);
+            
+            model.addAttribute("usuarioDTO", usuarioDTO);
+            model.addAttribute("disponibilidad", disponibilidad);
         }
 
         return "/usuario/perfil";
@@ -197,39 +226,122 @@ public class UsuarioController {
     public String editarPerfil(HttpSession session, Model model, RedirectAttributes redirectAttributes) {     
 
         if (session.getAttribute("logueado") == null){
-            redirectAttributes.addFlashAttribute("sesion inválida");
+            redirectAttributes.addFlashAttribute("error", "sesión inválida");
             return "redirect:/index";//sesion no valida
         }
-        else{
-            UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
-            model.addAttribute("usuario", usuarioDTO);
-        }
-
-        return "/usuario/perfil";
+        
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+        model.addAttribute("usuarioDTO", usuarioDTO);
+        model.addAttribute("departamentos", deptService.findAll());
+        return "/usuario/editar";
     }
 
     @PostMapping("/perfil/editar")
-    public String guardarCambios(HttpSession session, @ModelAttribute("usuario") UsuarioDTO usuarioDTO, RedirectAttributes redirectAttributes)
+    public String guardarCambios(HttpSession session, @ModelAttribute("usuarioDTO") UsuarioDTO usuarioDTO, RedirectAttributes redirectAttributes, Model model)
     {
 
         try {
             if (session.getAttribute("logueado") == null){
-                redirectAttributes.addFlashAttribute("sesion inválida");
+                redirectAttributes.addFlashAttribute("error", "sesión inválida");
                 return "redirect:/index";//sesion no valida
             } 
-            else{
-                /* manejar logica de update */
+
+            //mejorar esto
+            UsuarioDTO sessionUsuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+            usuarioDTO.setId(sessionUsuarioDTO.getId());
+            usuarioService.actualizarPerfil(usuarioDTO);
+
+            if(sessionUsuarioDTO.getCorreo()!=usuarioDTO.getCorreo())
+            {
+                session.invalidate();
+                redirectAttributes.addFlashAttribute("mensaje", "Correo actualizado. Inicie sesión nuevamente");
+                return "redirect:/index";
             }
-        
         } 
         catch (Exception e) {
             e.printStackTrace(); //cambiar por looger en el futuro 
-            redirectAttributes.addFlashAttribute("Error inesperado");
+            redirectAttributes.addFlashAttribute("error","Error inesperado");
             return "redirect:/index";//sesion no valida
         }
         
+        model.addAttribute("usuarioDTO", usuarioDTO);
+        model.addAttribute("departamentos", deptService.findAll());
+        return "/usuario/perfil";
+    }
 
-        return "redirect:/perfil";
+
+    
+    @GetMapping("/perfil/disponibilidad")
+    public String mostrarFormularioDisponibilidad(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        
+
+        if (session.getAttribute("logueado") == null){
+            redirectAttributes.addFlashAttribute("error", "sesión inválida");
+            return "redirect:/index";//sesion no valida
+        }
+
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+        List<DisponibilidadEntity> disponibilidad = disponibilidadService.findByIdTecnico(usuarioDTO.getId()).orElse(null);
+        model.addAttribute("disponibilidad", disponibilidad);
+        model.addAttribute("dias", diaService.findAll());
+
+        return "/usuario/disponibilidad";
+    }
+    
+
+
+    @PostMapping("/perfil/disponibilidad")
+    public String guardarDisponibilidad(@RequestParam Integer idDia, @RequestParam String formHoraInicio, @RequestParam String formHoraFin, HttpSession session, Model model, RedirectAttributes redirectAttributes) 
+    {
+
+        if (session.getAttribute("logueado") == null){
+            redirectAttributes.addFlashAttribute("error", "sesión inválida");
+            return "redirect:/index";//sesion no valida
+        }
+
+        LocalTime horaInicio = LocalTime.parse(formHoraInicio);
+        LocalTime horaFin = LocalTime.parse(formHoraFin);
+
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+        
+        switch (disponibilidadService.save(horaInicio, horaFin, idDia, usuarioDTO.getId())) {
+            case 1:
+                //incompatible
+                model.addAttribute("mensaje", "Existe incompatibilidad horariaa");
+                break;
+        
+            default:
+                break;
+        }
+
+
+        List<DisponibilidadEntity> disponibilidad = disponibilidadService.findByIdTecnico(usuarioDTO.getId()).orElse(null);
+        model.addAttribute("disponibilidad", disponibilidad);
+        model.addAttribute("dias", diaService.findAll());
+
+        return "/usuario/disponibilidad";
+    }
+
+
+    @PostMapping("/perfil/disponibilidad/eliminar")
+    public String eliminarDisponibilidad(HttpSession session, @RequestParam("id") Long id, Model model, RedirectAttributes redirectAttributes) 
+    {
+        if (session.getAttribute("logueado") == null){
+            redirectAttributes.addFlashAttribute("error", "sesión inválida");
+            return "redirect:/index";//sesion no valida
+        }
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+        
+        if(!disponibilidadService.deleteById(id, usuarioDTO.getId())){
+            redirectAttributes.addFlashAttribute("error", "eliminación fallida");
+            return "redirect:/index";
+        }
+
+
+        model.addAttribute("disponibilidad", disponibilidadService.findByIdTecnico(usuarioDTO.getId()).orElse(null));
+        model.addAttribute("dias", diaService.findAll());
+
+        return "/usuario/disponibilidad";
     }
 
 }

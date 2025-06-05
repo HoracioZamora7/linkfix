@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProvinciaServiceImpl implements ProvinciaService {
@@ -23,5 +24,10 @@ public class ProvinciaServiceImpl implements ProvinciaService {
     @Override
     public List<ProvinciaEntity> findByDepartamentoId(String departmentId) {
         return repository.findByDepartamentoId(departmentId);
+    }
+
+    @Override
+    public Optional<ProvinciaEntity> findById(String id) {
+        return repository.findById(id);
     }
 }

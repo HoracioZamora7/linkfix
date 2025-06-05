@@ -15,7 +15,7 @@
 
                 <h1 class="card-title text-center text-primary mb-4">Bienvenido al sistema</h1>
 
-                <!-- Mostrar el correo y roles del usuario logueado -->
+                <!-- div para usuarios logueados -->
                 <div th:if="${session.logueado != null}">
 
                     <p class="mb-1">
@@ -25,8 +25,10 @@
 
                     <p class="mb-2"><strong>Roles:</strong></p>
                     <ul class="list-group mb-3">
-                        <li class="list-group-item" th:each="rol : ${session.logueado.roles}" th:text="${rol}">Rol</li>
+                        <li class="list-group-item" th:each="rol : ${session.logueado.nombresRoles}" th:text="${rol}">Rol</li>
                     </ul>
+
+                    <a th:href="@{/perfil}"> Visitar perfil </a>
 
                     <!-- Enlace solo si tiene rol 1 (Administrador) -->
                     <a th:if="${session.logueado != null and session.logueado.roles.contains(1)}"
@@ -40,7 +42,7 @@
                     </form>
                 </div>
 
-                <!-- Si no hay sesión válida -->
+                <!-- div por si no hay sesión válida -->
                 <div th:if="${session.logueado == null}">
                     <div class="alert alert-warning text-center">Sesión no válida</div>
                     <div class="text-center">
