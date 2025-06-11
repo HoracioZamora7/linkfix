@@ -27,6 +27,8 @@ import com.linkfix.mapper.UsuarioMapper;
 import com.linkfix.service.DepartamentoService;
 import com.linkfix.service.DiaService;
 import com.linkfix.service.DisponibilidadService;
+import com.linkfix.service.ElectrodomesticoService;
+import com.linkfix.service.EspecialidadService;
 import com.linkfix.service.EstadoService;
 import com.linkfix.service.PersonaService;
 import com.linkfix.service.RolService;
@@ -74,6 +76,12 @@ public class UsuarioController {
 
     @Autowired
     private DiaService diaService;
+
+    @Autowired
+    private EspecialidadService especialidadService;
+
+    @Autowired
+    private ElectrodomesticoService electrodomesticoService;
 
     /*  */
 
@@ -344,4 +352,22 @@ public class UsuarioController {
         return "/usuario/disponibilidad";
     }
 
+
+    @GetMapping("/perfil/especialidades")
+    public String mostrarEspecilidades(HttpSession session, Model model, RedirectAttributes redirectAttributes)
+    {
+        if (session.getAttribute("logueado") == null){
+            redirectAttributes.addFlashAttribute("error", "sesión inválida");
+            return "redirect:/index";//sesion no valida
+        }
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+
+
+        model.addAttribute("listaEspecialidades", especialidadService.findByIdTecnico(usuarioDTO.getId()));
+        model.addAttribute("electromesticos", electrodomesticoService.findAll());
+        
+        
+                
+        return "/usuario/especialidad";
+    }
 }

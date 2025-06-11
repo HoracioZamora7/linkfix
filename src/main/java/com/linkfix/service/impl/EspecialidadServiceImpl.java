@@ -20,4 +20,11 @@ public class EspecialidadServiceImpl implements EspecialidadService{
         return reposity.findAll();
     }
 
+    @Override
+    public List<EspecialidadEntity> findByIdTecnico(Long id) {
+       
+       return reposity.findByIdTecnico(id).orElse(null);
+       
+    }
+
 }
