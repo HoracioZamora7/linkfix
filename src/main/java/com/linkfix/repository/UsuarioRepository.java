@@ -3,6 +3,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.linkfix.entity.UsuarioEntity;
@@ -15,5 +16,6 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long>
     List<UsuarioEntity> findAll();
     UsuarioEntity findByCorreo(String correo);
 
-    
+    @Query("select u from UsuarioEntity u where u.emailToken = :token")
+    UsuarioEntity findByEmailToken(@Param("token") String token);    
 }

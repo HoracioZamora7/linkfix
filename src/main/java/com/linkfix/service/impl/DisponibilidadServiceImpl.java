@@ -1,14 +1,10 @@
 package com.linkfix.service.impl;
-
-import java.sql.Time;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.linkfix.entity.DiaEntity;
 import com.linkfix.entity.DisponibilidadEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.repository.DisponibilidadRepository;

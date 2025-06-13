@@ -2,6 +2,7 @@ package com.linkfix.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import com.linkfix.entity.UbigeoDistritosEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.repository.UsuarioRepository;
 import com.linkfix.service.DepartamentoService;
+import com.linkfix.service.EmailService;
 import com.linkfix.service.PersonaService;
 import com.linkfix.service.ProvinciaService;
 import com.linkfix.service.UbigeoService;
@@ -42,6 +44,9 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Autowired
     private PersonaService personaService;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public List<UsuarioEntity> listAll() 
     {
@@ -49,11 +54,15 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public UsuarioEntity save(UsuarioEntity u) 
+    public UsuarioEntity registrar(UsuarioEntity u) 
     {
+        personaService.save(u.getPersona());
         u.setContrasena(passwordEncoder.encode(u.getContrasena()));
         u.setFecha_registro(LocalDateTime.now());
-        return repository.save(u);
+        u.setEmailToken(UUID.randomUUID().toString());
+        u.setEmailTokenFechaExpiracion(LocalDateTime.now().plusMinutes(1));
+
+        return generarToken(u);
     }
 
     @Override//
@@ -87,6 +96,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         dto.setCalificacion(usuario.getCalificacion());
         dto.setFecha_registro(usuario.getFecha_registro());
         dto.setTelefono(usuario.getPersona().getTelefono());
+        //ruc
+        dto.setRuc(usuario.getPersona().getRuc());
 
         //temporal
         DepartamentoEntity departamento = departamentoService.findById(usuario.getPersona().getUbigeo().getDepartmentId()).orElse(null);
@@ -140,5 +151,20 @@ public class UsuarioServiceImpl implements UsuarioService {
         } catch (Exception e) {
             return 2;
         }
+    }
+
+    @Override
+    public UsuarioEntity findByEmailToken(String token) {
+        return repository.findByEmailToken(token);
+    }
+
+    @Override
+    public UsuarioEntity generarToken(UsuarioEntity u) {
+        u.setEmailToken(UUID.randomUUID().toString());
+        u.setEmailTokenFechaExpiracion(LocalDateTime.now().plusMinutes(1));
+        emailService.sendEmail(u.getCorreo(), "Token", "http://localhost:8080/registrar/verificar-email?token="+ u.getEmailToken());
+
+        
+        return repository.save(u);
     }
 }

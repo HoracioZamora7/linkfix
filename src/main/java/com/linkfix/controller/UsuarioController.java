@@ -1,8 +1,10 @@
 package com.linkfix.controller;
 
 import java.sql.Time;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,7 @@ import com.linkfix.dto.DniResponse;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.DiaEntity;
 import com.linkfix.entity.DisponibilidadEntity;
+import com.linkfix.entity.RolEntity;
 import com.linkfix.entity.SolicitudRegistroEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.entity.UsuarioRolEntity;
@@ -92,10 +95,34 @@ public class UsuarioController {
     @PostMapping("/registro")
     public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario, Model model, RedirectAttributes redirectAttributes) {
         try {
-            String dni = usuario.getPersona().getDni();
+            
 
+            UsuarioEntity usuarioExistente = usuarioService.findByCorreo(usuario.getCorreo());
+            //si ya existe el correo..
+            if(usuarioExistente!=null)
+            {
+                //pero si tiene el estado 5 (correo sin confirmar)
+                if(usuarioExistente.getEstado().getId()==5)
+                {
+                    usuarioExistente.setCorreo(usuario.getCorreo());  //se actualiza unicamente el correo
+                    usuarioService.generarToken(usuarioExistente); //se le genera un nuevo token
+                    redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado. Por favor, revise la bandeja de entrada de su correo. Tienes un minuto para verificar el correo");
+                }
+                else{
+                    redirectAttributes.addFlashAttribute("error", "Correo ya existente.");
+                }
+
+                return "redirect:/index";
+            }
+            
+            // Validar roles seleccionados
+            if (!usuario.isCliente() && !usuario.isTecnico()) {
+                redirectAttributes.addFlashAttribute("error", "Debe seleccionar al menos un rol.");
+                return "redirect:/index";
+            }
+            String dni = usuario.getPersona().getDni();
             // Validar formato DNI
-             if (dni == null || dni.length() != 8 || !dni.matches("\\d+")) {
+            if (dni == null || dni.length() != 8 || !dni.matches("\\d+")) {
                 redirectAttributes.addFlashAttribute("error", "El DNI ingresado no es válido.");
                 return "redirect:/index";
             }
@@ -103,7 +130,7 @@ public class UsuarioController {
             //Llamar a la API externa para obtener los nombres
             String url = "https://apiperu.dev/api/dni/" + dni + "?api_token=" + apiToken;
             DniResponse response = restTemplate.getForObject(url, DniResponse.class);
-
+            //validar que el dni exista
             if (response == null || !response.isSuccess() || response.getData() == null)
             {
                 redirectAttributes.addFlashAttribute("error", "No se encontraron nombres para el DNI ingresado.");
@@ -111,24 +138,14 @@ public class UsuarioController {
             }
 
             // Cargar nombres y apellidos en el objeto Persona
-            String nombre = response.getData().getNombre();
-            String apellidos = response.getData().getApellidoPaterno() + " " + response.getData().getApellidoMaterno();
-            usuario.getPersona().setNombre(nombre);
-            usuario.getPersona().setApellidos(apellidos);
+            usuario.getPersona().setNombre(response.getData().getNombre());
+            usuario.getPersona().setApellidos(response.getData().getApellidoPaterno() + " " + response.getData().getApellidoMaterno());
             
-            logger.info("datos: " + nombre);
-            logger.info("+datos: " + response.isSuccess());
-
-            // Validar roles seleccionados
-            if (!usuario.isCliente() && !usuario.isTecnico()) {
-                redirectAttributes.addFlashAttribute("error", "Debe seleccionar al menos un rol.");
-                return "redirect:/index";
-            }
-
-            personaService.save(usuario.getPersona());
-            usuario.setEstado(estadoService.findById(1)); // Activo
-            usuarioService.save(usuario);
-
+            //persistir datos
+            
+            usuario.setEstado(estadoService.findById(5)); //Correo no verificado
+            usuarioService.registrar(usuario);
+            
             if (usuario.isCliente()) {
                 UsuarioRolEntity clienterol = new UsuarioRolEntity();
                 clienterol.setUsuario(usuario);
@@ -141,29 +158,69 @@ public class UsuarioController {
                 tecnicorol.setUsuario(usuario);
                 tecnicorol.setRol(rolService.findById(3)); // Técnico
                 usuarioRolSevice.save(tecnicorol);
-
                 //api sunat aca
-                usuario.setEstado(estadoService.findById(3)); //Pendiente
-                usuarioService.update(usuario);
-
+                //usuario.setEstado(estadoService.findById(3)); //Pendiente
+                //usuarioService.update(usuario);
                 //creacion de una solicitud de registro
                 SolicitudRegistroEntity solicitudRegistro = new SolicitudRegistroEntity();
                 solicitudRegistro.setTecnico(usuario);
                 solicitudRegistroService.save(solicitudRegistro);
-
-                redirectAttributes.addFlashAttribute("mensaje", "Registro enviado, pendiente de aprobación.");
-                return "redirect:/index";
+                //redirectAttributes.addFlashAttribute("mensaje", "Registro enviado, pendiente de aprobación.");
+                //return "redirect:/index";
             }
 
-            redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado correctamente.");
+
+
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado. Por favor, revise la bandeja de entrada de su correo. Tienes un minuto para verificar el correo");
             return "redirect:/index";
 
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace(); //aca se debería eliminar el registro de persona y usuario
             redirectAttributes.addFlashAttribute("error", "Ocurrió un error durante el registro.");
             return "redirect:/index";
         }
     }
+
+    @GetMapping("/registrar/verificar-email")
+    public String verificarMail(@RequestParam("token") String emailToken, RedirectAttributes redirectAttributes)
+    {
+        UsuarioEntity usuarioEntity = usuarioService.findByEmailToken(emailToken);
+
+        if(usuarioEntity == null || usuarioEntity.getEstado().getId()!=5)
+        {
+            redirectAttributes.addFlashAttribute("error", "Token inválido");
+            return "redirect:/index";
+        }
+
+        if(usuarioEntity.getEmailTokenFechaExpiracion().isBefore(LocalDateTime.now()))
+        {
+            redirectAttributes.addFlashAttribute("error", "Token expirado. Se generará uno nuevo.");
+            usuarioService.generarToken(usuarioEntity);
+            return "redirect:/index";
+        }
+
+        if(usuarioEntity.getEmailToken().equals(emailToken))
+        {
+            if(usuarioRolSevice.findRolesByUsuario(usuarioEntity).contains(rolService.findById(3)))//si es tecnico
+            {
+                usuarioEntity.setEstado(estadoService.findById(3)); //Pendiente
+                
+                redirectAttributes.addFlashAttribute("mensaje", "Cuenta activada. Usuario tipo técnico pendiente de aprobación");
+            }
+            else{
+                redirectAttributes.addFlashAttribute("mensaje", "Cuenta activada. Por favor, inicie sesión");
+                usuarioEntity.setEstado(estadoService.findById(1)); //Activo
+            }
+
+            usuarioService.update(usuarioEntity);
+            return "redirect:/login";
+        }
+        
+        redirectAttributes.addFlashAttribute("error", "Error en la validacion");
+        return "redirect:/index";
+        
+    }
+
 
     @PostMapping("/login")
     public String login(@RequestParam("correo") String correo, @RequestParam("contrasena") String contrasena,  HttpSession session,  Model model) 
@@ -175,8 +232,23 @@ public class UsuarioController {
             return "login";
         }
     
+        if (usuario.getEstado().getId()==1)
+        {
+            if(passwordEncoder.matches(contrasena, usuario.getContrasena())) {
+                UsuarioDTO usuarioDTO = usuarioService.toSessionUsuarioDTO(usuario, usuarioRolSevice.findRolesByUsuario(usuario));
+                session.setAttribute("logueado", usuarioDTO);//variable sesion
+                return "redirect:/home";
+            }
+            else{
+                model.addAttribute("error", "Contraseña incorrectos");
+            }
+        }
+        else{
+            model.addAttribute("error", "No puedes logearte aún, tienes el estado: "+usuario.getEstado().getNombre());
+        }
+
         //si el usuario tiene el estado...
-        switch (usuario.getEstado().getId()) {
+/*         switch (usuario.getEstado().getId()) {
             //activo
             case 1:
                 if(passwordEncoder.matches(contrasena, usuario.getContrasena())) {
@@ -198,7 +270,7 @@ public class UsuarioController {
                 break;
             default:
                 break;
-        }        
+        }     */    
 
         return "login";
     }

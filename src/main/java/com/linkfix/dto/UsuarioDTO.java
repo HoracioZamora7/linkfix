@@ -25,6 +25,7 @@ public class UsuarioDTO {
     private String apellidos;
     private String direccion;
     private String telefono;
+    private String ruc;
 
     //esto se podría separar en otro dto
     private List<Integer> roles;

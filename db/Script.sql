@@ -15,6 +15,7 @@ create table Persona
 	nombre varchar(50),
 	apellidos varchar(50),
 	dni char(8) unique not null,
+	ruc varchar(20) unique,
 	idUbigeo varchar(6),
 	telefono varchar(9) unique,
 	direccion varchar(75),
@@ -30,6 +31,10 @@ create table Usuario
 	calificacion float,
 	idEstado int,
 	fecha_registro DATETIME default now(),
+	emailToken varchar(255),
+	emailTokenFechaExpiracion DATETIME,
+	fechaUltimaEdicion DATETIME,
+	idUsuarioUltimaEdicion bigint,
 	
 	primary key (id)
 );
@@ -2335,6 +2340,10 @@ foreign key (idPersona) references Persona(id);
 alter table Usuario add constraint fk_usuario_estado
 foreign key (idEstado) references Estado(id);
 
+-- idUsuarioUltimaEdicion Usuario -> Usuario
+alter table Usuario add constraint fk_usuario_usuario
+foreign key (idUsuarioUltimaEdicion) references Usuario(id);
+
 -- UsuarioRol -> Usuario, Rol
 alter table UsuarioRol add constraint fk_UsuarioRol_usuario
 foreign key (idUsuario) references Usuario(id);
@@ -2393,7 +2402,72 @@ foreign key (idEstado) references Estado(id);
 insert into rol(nombre) values('Administrador'),('Cliente'),('Técnico');
 
 /*estados usuario*/
-insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente'), ('Rechazado');
+insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente de aprobación'), ('Rechazado'), ('Correo no confirmado');
 
 
-insert into dia(nombre) values ('Lunes'), ('Martes'), ('Miercoles'), ('Jueves'), ('Viernes'), ('Sábado'), ('Domingo')
+insert into dia(nombre) values ('Lunes'), ('Martes'), ('Miercoles'), ('Jueves'), ('Viernes'), ('Sábado'), ('Domingo');
+
+
+
+/* tabla auditoria*/
+
+CREATE TABLE AUD_UsuarioHistorial (
+    id bigint AUTO_INCREMENT PRIMARY KEY,
+    idUsuario bigint,
+    correo varchar(50),
+    idEstado INT,
+    fecha_registro DATETIME,
+    emailToken VARCHAR(255),
+    emailTokenFechaExpiracion DATETIME,
+    fechaUltimaEdicion DATETIME,
+    idUsuarioUltimaEdicion BIGINT,
+    
+    idPersona BIGINT,
+    nombre VARCHAR(50),
+    apellidos VARCHAR(50),
+    dni CHAR(8),
+    ruc VARCHAR(20),
+    idUbigeo VARCHAR(6),
+    telefono VARCHAR(9),
+    direccion VARCHAR(75),
+
+    fecha_cambio DATETIME DEFAULT NOW()
+);
+DELIMITER $$
+
+CREATE TRIGGER after_usuario_update
+AFTER UPDATE ON Usuario
+FOR EACH ROW
+BEGIN
+    DECLARE p_nombre VARCHAR(50);
+    DECLARE p_apellidos VARCHAR(50);
+    DECLARE p_dni CHAR(8);
+    DECLARE p_ruc VARCHAR(20);
+    DECLARE p_idUbigeo VARCHAR(6);
+    DECLARE p_telefono VARCHAR(9);
+    DECLARE p_direccion VARCHAR(75);
+
+    -- Obtener datos de Persona relacionada
+    SELECT nombre, apellidos, dni, ruc, idUbigeo, telefono, direccion
+    INTO p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion
+    FROM Persona
+    WHERE id = NEW.idPersona;
+
+    -- Insertar en historial
+    INSERT INTO AUD_UsuarioHistorial (
+        idUsuario, correo, idEstado, fecha_registro, emailToken, emailTokenFechaExpiracion,
+        fechaUltimaEdicion, idUsuarioUltimaEdicion,
+        idPersona, nombre, apellidos, dni, ruc, idUbigeo, telefono, direccion,
+        fecha_cambio
+    )
+    VALUES (
+        NEW.id, NEW.correo, NEW.idEstado, NEW.fecha_registro, NEW.emailToken, 
+        NEW.emailTokenFechaExpiracion, NEW.fechaUltimaEdicion, NEW.idUsuarioUltimaEdicion,
+        NEW.idPersona, p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion,
+        NOW()
+    );
+END$$
+
+DELIMITER ;
+
+
