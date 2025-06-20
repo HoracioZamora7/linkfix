@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Técnicos Disponibles</title>
+</head>
+<body>
+
+<h1>Buscar Técnicos Disponibles</h1>
+
+<form method="get" th:action="@{/servicio/buscar}">
+    <label for="idElectrodomestico">Electrodoméstico:</label>
+    <select name="idElectrodomestico" id="idElectrodomestico">
+        <option value="">-- Todos --</option>
+        <option th:each="elec : ${listaElectrodomesticos}" 
+                th:value="${elec.id}" 
+                th:text="${elec.nombre}"
+                th:selected="${elec.id} == ${idElectrodomestico}"></option>
+    </select>
+
+    <label for="idDia">Día:</label>
+    <select name="idDia" id="idDia">
+        <option value="">-- Todos --</option>
+        <option th:each="dia : ${listaDias}" 
+                th:value="${dia.id}" 
+                th:text="${dia.nombre}" 
+                th:selected="${dia.id} == ${idDia}"></option>
+    </select>
+
+    <label for="formHoraInicio">Desde:</label>
+    <input type="time" id="formHoraInicio" name="formHoraInicio" th:value="${formHoraInicio}"/>
+
+    <label for="formHoraFin">Hasta:</label>
+    <input type="time" id="formHoraFin" name="formHoraFin" th:value="${formHoraFin}"/>
+
+    <button type="submit">Buscar</button>
+</form>
+
+<hr>
+
+<!-- Si la lista está vacía -->
+<div th:if="${#lists.isEmpty(listadoTecnicos)}">
+    <p>No se encontraron técnicos disponibles con los criterios seleccionados.</p>
+</div>
+
+<!-- Si hay técnicos -->
+<div th:if="${!#lists.isEmpty(listadoTecnicos)}">
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Nombre completo</th>
+                <th>Correo</th>
+                <th>Calificación</th>
+                <th>Día</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
+                <th>Especialista</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="tecnico : ${listadoTecnicos}">
+                <td th:text="${tecnico.nombreCompleto}"></td>
+                <td th:text="${tecnico.correo}"></td>
+                <td th:text="${tecnico.calificacion}"></td>
+                <td th:text="${tecnico.nombreDia} ?: '—'"></td>
+                <td th:text="${tecnico.horaInicio} ?: '—'"></td>
+                <td th:text="${tecnico.horaFin} ?: '—'"></td>
+                <td th:text="${tecnico.tieneEspecialidad == 1 ? 'Sí' : 'No'}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div>
+        <span th:text="'Página ' + ${page + 1} + ' de ' + ${totalPages}"></span>
+
+        <div>
+            <a th:href="@{/servicio(page=0, size=${size}, 
+                                    idElectrodomestico=${idElectrodomestico},
+                                    idDia=${idDia},
+                                    formHoraInicio=${formHoraInicio},
+                                    formHoraFin=${formHoraFin})}"
+               th:if="${page > 0}">Primera</a>
+
+            <a th:href="@{/servicio(page=${page - 1}, size=${size}, 
+                                    idElectrodomestico=${idElectrodomestico},
+                                    idDia=${idDia},
+                                    formHoraInicio=${formHoraInicio},
+                                    formHoraFin=${formHoraFin})}"
+               th:if="${page > 0}">Anterior</a>
+
+            <a th:href="@{/servicio(page=${page + 1}, size=${size}, 
+                                    idElectrodomestico=${idElectrodomestico},
+                                    idDia=${idDia},
+                                    formHoraInicio=${formHoraInicio},
+                                    formHoraFin=${formHoraFin})}"
+               th:if="${page + 1 < totalPages}">Siguiente</a>
+
+            <a th:href="@{/servicio(page=${totalPages - 1}, size=${size}, 
+                                    idElectrodomestico=${idElectrodomestico},
+                                    idDia=${idDia},
+                                    formHoraInicio=${formHoraInicio},
+                                    formHoraFin=${formHoraFin})}"
+               th:if="${page + 1 < totalPages}">Última</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

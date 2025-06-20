@@ -1,7 +1,12 @@
 package com.linkfix.service;
 
+import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
+import com.linkfix.dto.TecnicoListadoDTO;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.RolEntity;
 import com.linkfix.entity.UsuarioEntity;
@@ -18,4 +23,6 @@ public interface UsuarioService {
     
     //mapeador
     public UsuarioDTO toSessionUsuarioDTO(UsuarioEntity usuario, List<RolEntity> roles);
+
+    public Page<TecnicoListadoDTO> listarTecnicosDisponibles(String idUbigeo, Long idElectrodomestico, Integer idDia, LocalTime horaInicio, LocalTime horaFIn, Pageable pageable);
 }

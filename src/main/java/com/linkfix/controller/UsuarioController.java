@@ -247,31 +247,6 @@ public class UsuarioController {
             model.addAttribute("error", "No puedes logearte aún, tienes el estado: "+usuario.getEstado().getNombre());
         }
 
-        //si el usuario tiene el estado...
-/*         switch (usuario.getEstado().getId()) {
-            //activo
-            case 1:
-                if(passwordEncoder.matches(contrasena, usuario.getContrasena())) {
-                    UsuarioDTO usuarioDTO = usuarioService.toSessionUsuarioDTO(usuario, usuarioRolSevice.findRolesByUsuario(usuario));
-                    session.setAttribute("logueado", usuarioDTO);//variable sesion
-                    return "redirect:/home";
-                }
-                else{
-                    model.addAttribute("error", "Correo o contraseña incorrectos");
-                }
-                break;
-            //inactivo
-            case 2:
-                model.addAttribute("error", "Cuenta desactivada."); //añadir un caso por cada estado...
-                break;
-            //pendiente
-            case 3:
-                model.addAttribute("error", "Cuenta pendiente de aprobación. Por favor inténtelo más tarde"); //añadir un caso por cada estado...
-                break;
-            default:
-                break;
-        }     */    
-
         return "login";
     }
 

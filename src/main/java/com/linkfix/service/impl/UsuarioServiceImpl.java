@@ -1,14 +1,19 @@
 package com.linkfix.service.impl;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.linkfix.dto.TecnicoListadoDTO;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.DepartamentoEntity;
 import com.linkfix.entity.ProvinciaEntity;
@@ -22,6 +27,8 @@ import com.linkfix.service.PersonaService;
 import com.linkfix.service.ProvinciaService;
 import com.linkfix.service.UbigeoService;
 import com.linkfix.service.UsuarioService;
+
+import jakarta.mail.MessagingException;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
@@ -162,9 +169,27 @@ public class UsuarioServiceImpl implements UsuarioService {
     public UsuarioEntity generarToken(UsuarioEntity u) {
         u.setEmailToken(UUID.randomUUID().toString());
         u.setEmailTokenFechaExpiracion(LocalDateTime.now().plusMinutes(1));
-        emailService.sendEmail(u.getCorreo(), "Token", "http://localhost:8080/registrar/verificar-email?token="+ u.getEmailToken());
+        //email sender sencillo
+        //emailService.sendEmail(u.getCorreo(), "Token", "http://localhost:8080/registrar/verificar-email?token="+ u.getEmailToken());
 
+        Map<String, String> variables = new HashMap<>();
+        variables.put("username", u.getPersona().getApellidos()+", " + u.getPersona().getNombre());
+        variables.put("enlaceConfirmacion", "http://localhost:8080/registrar/verificar-email?token="+u.getEmailToken());
+
+        try {
+            emailService.sendHtmlEmail(u.getCorreo(), "Verificación de cuenta", "templates/email/templateMailConfirmacion.html", variables);
+        } catch (MessagingException e) {
+            emailService.sendEmail(u.getCorreo(), "Token", "http://localhost:8080/registrar/verificar-email?token="+ u.getEmailToken());
+            e.printStackTrace();
+        }
         
         return repository.save(u);
+    }
+
+    @Override
+    public Page<TecnicoListadoDTO> listarTecnicosDisponibles(String idUbigeo, Long idElectrodomestico, Integer idDia,
+            LocalTime horaInicio, LocalTime horaFin, Pageable pageable) {
+        
+        return repository.listarTecnicosDisponibles(idUbigeo, idElectrodomestico, idDia, horaInicio, horaFin, pageable);
     }
 }
