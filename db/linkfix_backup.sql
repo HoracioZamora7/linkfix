@@ -2411,63 +2411,116 @@ insert into dia(nombre) values ('Lunes'), ('Martes'), ('Miercoles'), ('Jueves'),
 
 /* tabla auditoria*/
 
-CREATE TABLE AUD_UsuarioHistorial (
-    id bigint AUTO_INCREMENT PRIMARY KEY,
+create table AUD_UsuarioHistorial (
+    id bigint auto_increment,
     idUsuario bigint,
     correo varchar(50),
-    idEstado INT,
-    fecha_registro DATETIME,
-    emailToken VARCHAR(255),
-    emailTokenFechaExpiracion DATETIME,
-    fechaUltimaEdicion DATETIME,
-    idUsuarioUltimaEdicion BIGINT,
+    idEstado int,
+    fecha_registro datetime,
+    emailToken varchar(255),
+    emailTokenFechaExpiracion datetime,
+    fechaUltimaEdicion datetime,
+    idUsuarioUltimaEdicion bigint,
     
-    idPersona BIGINT,
-    nombre VARCHAR(50),
-    apellidos VARCHAR(50),
-    dni CHAR(8),
-    ruc VARCHAR(20),
-    idUbigeo VARCHAR(6),
-    telefono VARCHAR(9),
-    direccion VARCHAR(75),
+    idPersona bigint,
+    nombre varchar(50),
+    apellidos varchar(50),
+    dni char(8),
+    ruc varchar(20),
+    idUbigeo varchar(6),
+    telefono varchar(9),
+    direccion varchar(75),
 
-    fecha_cambio DATETIME DEFAULT NOW()
+    fecha_cambio datetime default now(),
+    
+    primary KEY(id)
 );
 DELIMITER $$
 
-CREATE TRIGGER after_usuario_update
-AFTER UPDATE ON Usuario
-FOR EACH ROW
-BEGIN
-    DECLARE p_nombre VARCHAR(50);
-    DECLARE p_apellidos VARCHAR(50);
-    DECLARE p_dni CHAR(8);
-    DECLARE p_ruc VARCHAR(20);
-    DECLARE p_idUbigeo VARCHAR(6);
-    DECLARE p_telefono VARCHAR(9);
-    DECLARE p_direccion VARCHAR(75);
+create trigger after_usuario_update
+after update on Usuario
+for each row
+begin
+    declare p_nombre varchar(50);
+    declare p_apellidos varchar(50);
+    declare p_dni char(8);
+    declare p_ruc varchar(20);
+    declare p_idUbigeo varchar(6);
+    declare p_telefono varchar(9);
+    declare p_direccion varchar(75);
 
     -- Obtener datos de Persona relacionada
-    SELECT nombre, apellidos, dni, ruc, idUbigeo, telefono, direccion
-    INTO p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion
-    FROM Persona
-    WHERE id = NEW.idPersona;
+    select  nombre, apellidos, dni, ruc, idUbigeo, telefono, direccion
+    into p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion
+    from Persona
+    where id = new.idPersona;
 
-    -- Insertar en historial
-    INSERT INTO AUD_UsuarioHistorial (
+    -- Insertar en el historial
+    insert into AUD_UsuarioHistorial (
         idUsuario, correo, idEstado, fecha_registro, emailToken, emailTokenFechaExpiracion,
         fechaUltimaEdicion, idUsuarioUltimaEdicion,
         idPersona, nombre, apellidos, dni, ruc, idUbigeo, telefono, direccion,
         fecha_cambio
     )
-    VALUES (
-        NEW.id, NEW.correo, NEW.idEstado, NEW.fecha_registro, NEW.emailToken, 
-        NEW.emailTokenFechaExpiracion, NEW.fechaUltimaEdicion, NEW.idUsuarioUltimaEdicion,
-        NEW.idPersona, p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion,
-        NOW()
+    values (
+        new.id, new.correo, new.idEstado, new.fecha_registro, new.emailToken, 
+        new.emailTokenFechaExpiracion, new.fechaUltimaEdicion, new.idUsuarioUltimaEdicion,
+        new.idPersona, p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion,
+        now()
     );
 END$$
 
 DELIMITER ;
 
+-- storedp procedure para listado de tecnicos
 
+
+DELIMITER $$
+
+create procedure listarTecnicosDisponibles(
+    in p_idUbigeo varchar(6),
+    in p_idElectrodomestico bigint,
+    in p_idDia int,
+    in p_horaInicio time,
+    in p_horaFin time,
+    in p_page int,
+    in p_pageSize int
+)
+begin
+    declare v_offset int;
+
+    set v_offset = (p_page - 1) * p_pageSize;
+
+    select distinct 
+        u.id,
+        concat(p.apellidos, ', ', p.nombre) as nombreCompleto,
+        u.correo,
+        u.calificacion,
+        d.nombre as nombreDia,
+        disp.horaInicio,
+        disp.horaFin,
+        e.nombre as nombreElectrodomestico,
+        e.id as idElectrodomestico
+    from usuario u
+    join persona p on u.idPersona = p.id
+    left join especialidad esp on esp.idTecnico = u.id
+    left join electrodomestico e on esp.idElectrodomestico = e.id
+    left join disponibilidad disp on disp.idTecnico = u.id
+    left join dia d on d.id = disp.idDia
+    where u.idEstado = 1
+      and substring(p.idUbigeo, 1, 4) = substring(p_idUbigeo, 1, 4)
+      and (p_idDia is null or disp.idDia = p_idDia)
+      and (p_horaInicio is null or disp.horaInicio <= p_horaInicio)
+      and (p_horaFin is null or disp.horaFin >= p_horaFin)
+      and (p_idElectrodomestico is null or e.id = p_idElectrodomestico)
+    order by  
+        case 
+            when p_idElectrodomestico is null then 0 
+            when e.id = p_idElectrodomestico then 0 
+            else 1 
+        end,
+        u.calificacion desc 
+    limit p_pageSize offset v_offset;
+END$$
+
+DELIMITER ;

@@ -45,6 +45,8 @@
                         <td th:text="${solicitud.tecnico.correo}"></td>
                         <td th:text="${solicitud.tecnico.persona.apellidos}"></td>
                         <td th:text="${solicitud.tecnico.persona.nombre}"></td>
+                        <td th:text="${solicitud.tecnico.persona.ruc}"></td>
+                        <td th:text="${solicitud.tecnico.persona.dni}"></td>
                         <td th:text="${#temporals.format(solicitud.fecha_registro, 'yyyy-MM-dd HH:mm')}"></td>
                         <td th:text="${solicitud.fecha_revision != null ? #temporals.format(solicitud.fecha_revision, 'yyyy-MM-dd HH:mm') : '-'}"></td>
                         <td>

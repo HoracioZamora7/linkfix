@@ -1,0 +1,79 @@
+<!-- src/main/resources/templates/usuario/perfil.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Mi Perfil</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">perfil</h2>
+
+        <div class="card">
+            <div class="card-body">
+                <p>Nombre: <span th:text="${usuarioDTO.nombre}"></span></p>
+                <p>Apellidos: <span th:text="${usuarioDTO.apellidos}"></span></p>
+                <p>DNI: <span th:text="${usuarioDTO.dni}"></span></p>
+                <p>Correo: <span th:text="${usuarioDTO.correo}"></span></p>
+                <p>Teléfono: <span th:text="${usuarioDTO.telefono}"></span></p>
+                <p>Dirección: <span th:text="${usuarioDTO.direccion}"></span></p>
+                <p>Ubigeo: <span th:text="${usuarioDTO.ubigeo}"></span></p>
+                <p>Departamento: <span th:text="${usuarioDTO.departamento}"></span></p>
+                <p>Provincia: <span th:text="${usuarioDTO.provincia}"></span></p>
+                <p>Distrito: <span th:text="${usuarioDTO.distrito}"></span></p>
+                <p>Fecha de Registro: <span th:text="${#temporals.format(usuarioDTO.fecha_registro, 'yyyy-MM-dd HH:mm')}"></span></p>
+                
+                <p class="mb-2"><strong>Roles:</strong></p>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item" th:each="rolNombre : ${session.logueado.nombresRoles}" th:text="${rolNombre}">Rol</li>
+                    </ul>
+<hr>
+                <!-- solo visible para usuarios de rol técnico -->
+                <div th:if="${session.logueado.roles.contains(3)}">
+                    <p th:if="${usuarioDTO.calificacion==0}">Realiza más servicios para aumentar la calificación! (texto provisional)</p>
+                    <p>Calificación: <span th:text="${usuarioDTO.calificacion}"></span></p>
+
+                    <!-- esto se puede hacer desplegable -->
+                    <div th:if="${disponibilidad != null and !#lists.isEmpty(disponibilidad)}">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Día</th>
+                                    <th>Hora inicio</th>
+                                    <th>Hora fin</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="horario : ${disponibilidad}">
+                                    <td th:text="${horario.dia.nombre}"></td>
+                                    <td th:text="${horario.horaInicio}"></td>
+                                    <td th:text="${horario.horaFin}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <a th:if="${disponibilidad == null or #lists.isEmpty(disponibilidad)}" th:href="@{/perfil/disponibilidad}" class="btn btn-primary">Parece que aún no defines tu disponibilidad horaria. Hazlo ahora!</a>
+                        <a th:href="@{/perfil/disponibilidad}" class="btn btn-primary">Registrar horario</a>
+                    </div>
+                    
+
+                </div>
+
+            </div>
+        </div>
+<hr>
+        <div class="mt-3 text-center">
+            <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
+        </div>
+
+        <div class="mt-3 text-center">
+            <a th:href="@{/perfil/editar}" class="btn btn-primary">Editar perfil</a>
+        </div>
+    </div>
+
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

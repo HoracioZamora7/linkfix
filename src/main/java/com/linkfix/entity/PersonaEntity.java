@@ -32,6 +32,9 @@ public class PersonaEntity implements Serializable{
     @Column(name = "dni", length = 8)
     private String dni;
 
+    @Column(name = "ruc")
+    private String ruc;
+
     @ManyToOne
     @JoinColumn(name = "idUbigeo")
     private UbigeoDistritosEntity ubigeo;

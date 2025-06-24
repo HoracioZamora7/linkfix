@@ -3,11 +3,11 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
-import java.util.Date;
-
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import org.springframework.cglib.core.Local;
 
 @Data
 @AllArgsConstructor
@@ -47,10 +47,19 @@ public class UsuarioEntity implements Serializable{
     @Column(name = "fecha_registro")
     private LocalDateTime fecha_registro;
 
+    @Column(name = "emailToken")
+    private String emailToken;
+
+    @Column(name = "emailTokenFechaExpiracion")
+    private LocalDateTime emailTokenFechaExpiracion;
+
     @Transient
     private boolean tecnico;
 
     @Transient
     private boolean cliente;
+
+
+    
 }
 

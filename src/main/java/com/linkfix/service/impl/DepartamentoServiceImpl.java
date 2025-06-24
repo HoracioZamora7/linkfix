@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DepartamentoServiceImpl implements DepartamentoService {
@@ -18,5 +19,10 @@ public class DepartamentoServiceImpl implements DepartamentoService {
     @Override
     public List<DepartamentoEntity> findAll() {
         return repository.findAll();
+    }
+
+    @Override
+    public Optional<DepartamentoEntity> findById(String id) {
+        return repository.findById(id);
     }
 }
