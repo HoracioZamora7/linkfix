@@ -53,6 +53,9 @@ public class UsuarioEntity implements Serializable{
     @Column(name = "emailTokenFechaExpiracion")
     private LocalDateTime emailTokenFechaExpiracion;
 
+    @Column(name = "idUsuarioUltimaEdicion")
+    private Long idUsuarioUltimaEdicion;
+
     @Transient
     private boolean tecnico;
 

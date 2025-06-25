@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Historial de Usuarios</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+
+<h2>Historial de Usuarios</h2>
+
+<!-- Mensajes -->
+<div th:if="${error}" style="color: red;">[[${error}]]</div>
+
+<!-- Formulario de filtro -->
+<form method="get" th:action="@{/historial/usuarios}">
+    <input type="text" name="usuarioCorreo" placeholder="Buscar por correo" th:value="${usuarioCorreo}">
+    <button type="submit">Buscar</button>
+</form>
+
+<!-- Tabla de resultados -->
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Correo</th>
+            <th>Roles</th>
+            <th>Estado</th>
+            <th>Fecha cambio</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="item : ${historialPage.content}">
+            <td th:text="${item.idUsuario}">ID</td>
+            <td th:text="${item.correo}">Correo</td>
+            <td th:text="${item.roles}">Roles</td>
+            <td th:text="${item.nombreEstado}">Estado</td>
+            <td th:text="${#dates.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Paginación -->
+<div>
+    <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}">Página X de Y</span>
+
+    <div>
+        <a th:if="${page > 0}" th:href="@{|/historial/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}">Anterior</a>
+        <a th:if="${page + 1 < totalPages}" th:href="@{|/historial/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}">Siguiente</a>
+    </div>
+</div>
+
+</body>
+</html>

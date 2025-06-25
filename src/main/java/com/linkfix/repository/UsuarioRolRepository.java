@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.linkfix.entity.RolEntity;
@@ -17,4 +18,9 @@ public interface UsuarioRolRepository extends JpaRepository<UsuarioRolEntity, In
 
     @Query("SELECT ur.rol FROM UsuarioRolEntity ur WHERE ur.usuario = :usuario")
     List<RolEntity> findRolesByUsuario(UsuarioEntity usuario);
+
+
+    @Query("SELECT ur.rol FROM UsuarioRolEntity ur WHERE ur.usuario.id = :idUsuario")
+    List<RolEntity> findRolesByIdUsuario(@Param("idUsuario") Long id);
+
 }

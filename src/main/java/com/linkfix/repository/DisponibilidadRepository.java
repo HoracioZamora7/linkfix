@@ -19,9 +19,7 @@ public interface DisponibilidadRepository extends JpaRepository<DisponibilidadEn
     
     @Query("SELECT d FROM DisponibilidadEntity d WHERE d.dia.id = :idDia")
     Optional<List<DisponibilidadEntity>> findByDia(@Param("idDia") Integer id);
-    
-    //para detectar incomptbilidad horaria (falta testear)
+
     @Query("SELECT d FROM DisponibilidadEntity d WHERE d.dia.id = :idDia AND d.horaInicio <= :horaFin AND d.horaFin >= :horaInicio AND d.usuario.id = :idUsuario")
     Optional<List<DisponibilidadEntity>> revisarHorario(@Param("horaInicio") LocalTime horaInicio, @Param("horaFin") LocalTime horaFin, @Param("idDia") Integer idDia, @Param("idUsuario") Long idUsuario);
-
 }

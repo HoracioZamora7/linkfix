@@ -78,28 +78,30 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long>
             ELSE 1
         END,
         u.calificacion DESC
-""",
-countQuery = """
-    SELECT COUNT(DISTINCT u.id)
-    FROM usuario u
-    JOIN persona p ON u.idPersona = p.id
-    LEFT JOIN disponibilidad disp ON disp.idTecnico = u.id
-    WHERE u.idEstado = 1
-    AND (:idUbigeo IS NULL OR SUBSTRING(p.idUbigeo, 1, 4) = SUBSTRING(:idUbigeo, 1, 4))
-    AND (:idDia IS NULL OR disp.idDia = :idDia)
-    AND (:horaInicio IS NULL OR :horaFin IS NULL OR 
-         (disp.horaInicio <= :horaFin AND disp.horaFin >= :horaInicio))
-""",
-nativeQuery = true)
-Page<TecnicoListadoDTO> listarTecnicosDisponibles(
-    @Param("idUbigeo") String idUbigeo,
-    @Param("idElectrodomestico") Long idElectrodomestico,
-    @Param("idDia") Integer idDia,
-    @Param("horaInicio") LocalTime horaInicio,
-    @Param("horaFin") LocalTime horaFin,
-    Pageable pageable);
+    """,
+    countQuery = """
+        SELECT COUNT(DISTINCT u.id)
+        FROM usuario u
+        JOIN persona p ON u.idPersona = p.id
+        LEFT JOIN disponibilidad disp ON disp.idTecnico = u.id
+        WHERE u.idEstado = 1
+        AND (:idUbigeo IS NULL OR SUBSTRING(p.idUbigeo, 1, 4) = SUBSTRING(:idUbigeo, 1, 4))
+        AND (:idDia IS NULL OR disp.idDia = :idDia)
+        AND (:horaInicio IS NULL OR :horaFin IS NULL OR 
+            (disp.horaInicio <= :horaFin AND disp.horaFin >= :horaInicio))
+    """,
+    nativeQuery = true)
+    Page<TecnicoListadoDTO> listarTecnicosDisponibles(
+        @Param("idUbigeo") String idUbigeo,
+        @Param("idElectrodomestico") Long idElectrodomestico,
+        @Param("idDia") Integer idDia,
+        @Param("horaInicio") LocalTime horaInicio,
+        @Param("horaFin") LocalTime horaFin,
+        Pageable pageable
+    );
 
 }
+
 
 
 /* queries antiguas */

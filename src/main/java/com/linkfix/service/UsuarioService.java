@@ -15,7 +15,7 @@ public interface UsuarioService {
     public List<UsuarioEntity> listAll();
     public UsuarioEntity registrar(UsuarioEntity u);
     public UsuarioEntity update(UsuarioEntity u);
-    public Integer actualizarPerfil(UsuarioDTO usuarioDTO);
+    public boolean actualizarPerfil(UsuarioDTO usuarioDTO, Long idUsuarioUltimaEdicion);
     public UsuarioEntity findByCorreo(String c);
     public UsuarioEntity findById(Long id);
     public UsuarioEntity findByEmailToken(String token);

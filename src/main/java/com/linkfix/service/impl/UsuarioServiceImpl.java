@@ -144,19 +144,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     @Override
-    public Integer actualizarPerfil(UsuarioDTO usuarioDTO) {
+    public boolean actualizarPerfil(UsuarioDTO usuarioDTO, Long idUsuarioUltimaEdicion) {
         try {
             UsuarioEntity usuarioEntity = usuarioDTOToUsuarioEntity(usuarioDTO);
+            usuarioEntity.setIdUsuarioUltimaEdicion(idUsuarioUltimaEdicion);
+            
             personaService.save(usuarioEntity.getPersona());
             repository.save(usuarioEntity);
 
-            return 1;
-            
-
-
+            return true;
 
         } catch (Exception e) {
-            return 2;
+            return false;
         }
     }
 

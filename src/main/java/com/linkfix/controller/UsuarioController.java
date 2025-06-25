@@ -1,37 +1,27 @@
 package com.linkfix.controller;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
+import org.springframework.security.crypto.password.PasswordEncoder;
 import com.linkfix.dto.DniResponse;
 import com.linkfix.dto.UsuarioDTO;
-import com.linkfix.entity.DiaEntity;
 import com.linkfix.entity.DisponibilidadEntity;
-import com.linkfix.entity.RolEntity;
 import com.linkfix.entity.SolicitudRegistroEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.entity.UsuarioRolEntity;
-import com.linkfix.mapper.UsuarioMapper;
 import com.linkfix.service.DepartamentoService;
 import com.linkfix.service.DiaService;
 import com.linkfix.service.DisponibilidadService;
 import com.linkfix.service.EstadoService;
-import com.linkfix.service.PersonaService;
 import com.linkfix.service.RolService;
 import com.linkfix.service.SolicitudRegistroService;
 import com.linkfix.service.UsuarioRolService;
@@ -46,9 +36,6 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
-
-    @Autowired
-    private PersonaService personaService;
 
     @Autowired
     private UsuarioRolService usuarioRolSevice;
@@ -68,7 +55,6 @@ public class UsuarioController {
     @Autowired 
     private DepartamentoService deptService;
 
-
     @Autowired
     private RestTemplate restTemplate;
     
@@ -77,10 +63,6 @@ public class UsuarioController {
 
     @Autowired
     private DiaService diaService;
-
-    /*  */
-
-    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 
     @Value("${api.token}")
     private String apiToken;
@@ -91,12 +73,9 @@ public class UsuarioController {
         return usuarioDTO != null && usuarioDTO.getRoles().contains(1); //si contiene el rol 1 (admin)
     }
 
-
     @PostMapping("/registro")
     public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario, Model model, RedirectAttributes redirectAttributes) {
         try {
-            
-
             UsuarioEntity usuarioExistente = usuarioService.findByCorreo(usuario.getCorreo());
             //si ya existe el correo..
             if(usuarioExistente!=null)
@@ -170,7 +149,6 @@ public class UsuarioController {
             }
 
 
-
             redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado. Por favor, revise la bandeja de entrada de su correo. Tienes un minuto para verificar el correo");
             return "redirect:/index";
 
@@ -221,7 +199,6 @@ public class UsuarioController {
         
     }
 
-
     @PostMapping("/login")
     public String login(@RequestParam("correo") String correo, @RequestParam("contrasena") String contrasena,  HttpSession session,  Model model) 
     {
@@ -253,9 +230,8 @@ public class UsuarioController {
     @GetMapping("/perfil")
     public String verPerfil(HttpSession session, Model model, RedirectAttributes redirectAttributes) {     
 
-        if (session.getAttribute("logueado") == null){
-            redirectAttributes.addFlashAttribute("error", "sesión inválida");
-            return "redirect:/index";//sesion no valida
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
         }
         else{
             UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
@@ -272,9 +248,8 @@ public class UsuarioController {
     @GetMapping("/perfil/editar")
     public String editarPerfil(HttpSession session, Model model, RedirectAttributes redirectAttributes) {     
 
-        if (session.getAttribute("logueado") == null){
-            redirectAttributes.addFlashAttribute("error", "sesión inválida");
-            return "redirect:/index";//sesion no valida
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
         }
         
         UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
@@ -284,19 +259,18 @@ public class UsuarioController {
     }
 
     @PostMapping("/perfil/editar")
-    public String guardarCambios(HttpSession session, @ModelAttribute("usuarioDTO") UsuarioDTO usuarioDTO, RedirectAttributes redirectAttributes, Model model)
+    public String guardarCambiosPerfil(HttpSession session, @ModelAttribute("usuarioDTO") UsuarioDTO usuarioDTO, RedirectAttributes redirectAttributes, Model model)
     {
 
         try {
-            if (session.getAttribute("logueado") == null){
-                redirectAttributes.addFlashAttribute("error", "sesión inválida");
-                return "redirect:/index";//sesion no valida
-            } 
+            if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
+            }
 
             //mejorar esto
             UsuarioDTO sessionUsuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
             usuarioDTO.setId(sessionUsuarioDTO.getId());
-            usuarioService.actualizarPerfil(usuarioDTO);
+            usuarioService.actualizarPerfil(usuarioDTO, sessionUsuarioDTO.getId());
 
             if(sessionUsuarioDTO.getCorreo()!=usuarioDTO.getCorreo())
             {
@@ -322,9 +296,8 @@ public class UsuarioController {
     public String mostrarFormularioDisponibilidad(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         
 
-        if (session.getAttribute("logueado") == null){
-            redirectAttributes.addFlashAttribute("error", "sesión inválida");
-            return "redirect:/index";//sesion no valida
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
         }
 
         UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
@@ -341,9 +314,8 @@ public class UsuarioController {
     public String guardarDisponibilidad(@RequestParam Integer idDia, @RequestParam String formHoraInicio, @RequestParam String formHoraFin, HttpSession session, Model model, RedirectAttributes redirectAttributes) 
     {
 
-        if (session.getAttribute("logueado") == null){
-            redirectAttributes.addFlashAttribute("error", "sesión inválida");
-            return "redirect:/index";//sesion no valida
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
         }
 
         LocalTime horaInicio = LocalTime.parse(formHoraInicio);
@@ -373,10 +345,10 @@ public class UsuarioController {
     @PostMapping("/perfil/disponibilidad/eliminar")
     public String eliminarDisponibilidad(HttpSession session, @RequestParam("id") Long id, Model model, RedirectAttributes redirectAttributes) 
     {
-        if (session.getAttribute("logueado") == null){
-            redirectAttributes.addFlashAttribute("error", "sesión inválida");
-            return "redirect:/index";//sesion no valida
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
         }
+
         UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
         
         if(!disponibilidadService.deleteById(id, usuarioDTO.getId())){
@@ -390,5 +362,18 @@ public class UsuarioController {
 
         return "/usuario/disponibilidad";
     }
+
+    private boolean sesionIsValid(HttpSession httpSession)
+    {
+        return httpSession.getAttribute("logueado") != null; //si es null la sesion es invalida
+    }
+
+    private String handleSesionInvalida(RedirectAttributes redirectAttributes)
+    {
+        redirectAttributes.addFlashAttribute("error", "Sesión inválida");
+        return "redirect:/index";
+    }
+
+
 
 }

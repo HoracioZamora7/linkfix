@@ -70,8 +70,6 @@ public class ServicioController {
 
         Page<TecnicoListadoDTO> listadoTecnicosDTO = usuarioService.listarTecnicosDisponibles(usuarioDTO.getUbigeo(), idElectrodomestico, idDia, horaInicio, horaFin, pageable);
         
-
-
         model.addAttribute("listaDias", diaService.findAll());
         model.addAttribute("listaElectrodomesticos", electrodomesticoService.findAll());
         model.addAttribute("listadoTecnicos", listadoTecnicosDTO.getContent());
