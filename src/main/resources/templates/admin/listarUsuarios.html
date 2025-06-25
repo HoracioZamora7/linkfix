@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Listado de Usuarios</title>
+    <meta charset="UTF-8" />
+</head>
+<body>
+
+<h2>Listado de Usuarios</h2>
+
+<div th:if="${error}" th:text="${error}"></div>
+
+<!-- filtro -->
+<form method="get" th:action="@{/admin/usuarios}">
+    <input type="text" name="usuarioCorreo" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
+    <button type="submit">Búsqueda</button>
+</form>
+
+<!-- Tabla de resultados -->
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>IDPersona</th>
+            <th>Correo</th>
+            <th>Roles</th>
+            <th>Calificación </th>
+            <th>Estado</th>
+            <th>Fecha de registro</th>
+            <th>DNI</th>
+            <th>RUC</th>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>Dirección</th>
+            <th>Telefono</th>
+            <th>Ubigeo</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="item : ${usuarioPage}">
+            <td th:text="${item.idUsuario}">ID</td>
+            <td th:text="${item.correo}">Correo</td>
+            <td th:text="${item.roles}">Roles</td>
+            <td th:text="${item.estado}">Estado</td>
+            <td th:text="${#temporals.format(item.fecha_registro, 'dd/MM/yyyy HH:MM')}">Fecha de registro</td>
+            <td th:text="${item.dni}">DNI</td>
+            <td th:text="${item.ruc} ?: '-' ">RUC</td>
+            <td th:text="${item.nombre}">Nombres</td>
+            <td th:text="${item.apellidos}">Apellidos</td>
+            <td th:text="${item.direccion}">Direccion</td>
+            <td th:text="${item.direccion}">Telefono</td>
+            <td th:text="${item.ubigeo}">Ubigeo</td>
+            <td><a th:href="@{'/admin/editar/' + ${item.id}}" th:text="Editar">Editar</a></td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Paginación -->
+<div>
+    <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
+
+    <div>
+        <a th:if="${page > 0}" th:href="@{|/admin/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}">Anterior</a>
+        <a th:if="${page + 1 < totalPages}" th:href="@{|/admin/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}">Siguiente</a>
+    </div>
+</div>
+
+</body>
+</html>

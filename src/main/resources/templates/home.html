@@ -68,6 +68,12 @@
                         Historial cambios
                     </a>
 
+                    <a th:if="${session.logueado.roles.contains(1)}"
+                       th:href="@{/admin/usuarios}"
+                       class="btn btn-outline-success-custom mb-3 d-block">
+                        Listado de usuarios
+                    </a>
+
                     <form th:action="@{/logout}" method="post">
                         <button type="submit" class="btn btn-outline-danger btn-outline-danger-smooth w-100">
                             Cerrar sesión

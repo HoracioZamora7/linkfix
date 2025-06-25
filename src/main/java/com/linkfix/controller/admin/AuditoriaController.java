@@ -1,8 +1,7 @@
 package com.linkfix.controller.admin;
 
-import java.util.logging.Logger;
-
-import org.hibernate.engine.jdbc.env.internal.LobCreationLogging_.logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.linkfix.controller.UsuarioController;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.RolEntity;
 import com.linkfix.entity.aud.AUDUsuarioHistorial;
@@ -32,7 +32,7 @@ public class AuditoriaController {
     @Autowired
     private UsuarioRolService usuarioRolService;
 
-    private static Logger logger = new Logger;
+    private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 
     @GetMapping("/usuarios")
     public String listarHistorialUsuarios(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model, HttpSession session, RedirectAttributes redirectAttributes, @RequestParam(value = "usuarioCorreo", required = false) String correo) {
@@ -44,13 +44,16 @@ public class AuditoriaController {
         Pageable pageable = PageRequest.of(page, size);
         Page<AUDUsuarioHistorial> historialPage;
 
+        
         if(correo==null || correo.trim().isEmpty()){
             historialPage = historialService.findAll(pageable);
         } 
         else{
-            logger.info("correo en else"+correo);
+            correo=correo.trim();
+            //logger.info("correo: "+correo);
             historialPage = historialService.findByCorreo(correo, pageable);
             model.addAttribute("usuarioCorreo", correo);
+            //logger.info(historialPage.getContent().toString());
         }
 
         for(AUDUsuarioHistorial elemento: historialPage.getContent()){
@@ -74,7 +77,7 @@ public class AuditoriaController {
         model.addAttribute("totalElements", historialPage.getTotalElements()); 
 
 
-        return "auditoria/historialUsuarios";
+        return "admin/auditoria/historialUsuarios";
     }
 
     //

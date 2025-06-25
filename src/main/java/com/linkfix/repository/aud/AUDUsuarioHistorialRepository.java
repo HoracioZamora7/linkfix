@@ -13,8 +13,8 @@ import org.springframework.stereotype.Repository;
 public interface AUDUsuarioHistorialRepository extends JpaRepository<AUDUsuarioHistorial, Long> {
     Page<AUDUsuarioHistorial> findByIdUsuario(Long idUsuario, Pageable pageable);
     
-    /* @Query("SELECT d FROM DisponibilidadEntity d WHERE d.usuario.id = :idTecnico") */
-    @Query("SELECT a FROM AUDUsuarioHistorial a where a.correo LIKE '%:correo%'")
+    @Query(value="SELECT a FROM AUDUsuarioHistorial a where a.correo LIKE CONCAT('%', :correo, '%')")
     Page<AUDUsuarioHistorial> findByCorreo(@Param("correo") String correo, Pageable pageable);
+
     Page<AUDUsuarioHistorial> findAll(Pageable Pageable);
 }

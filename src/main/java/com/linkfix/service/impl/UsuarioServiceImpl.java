@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.linkfix.dto.ListadoUsuariosDTO;
 import com.linkfix.dto.TecnicoListadoDTO;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.DepartamentoEntity;
@@ -190,5 +191,12 @@ public class UsuarioServiceImpl implements UsuarioService {
             LocalTime horaInicio, LocalTime horaFin, Pageable pageable) {
         
         return repository.listarTecnicosDisponibles(idUbigeo, idElectrodomestico, idDia, horaInicio, horaFin, pageable);
+    }
+
+    @Override
+    public Page<ListadoUsuariosDTO> listarUsuarios(String correo, Pageable pageable) {
+
+        
+        return repository.listarUsuarios(correo, pageable);
     }
 }

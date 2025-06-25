@@ -8,17 +8,16 @@
 
 <h2>Historial de Usuarios</h2>
 
-<!-- Mensajes -->
-<div th:if="${error}" style="color: red;">[[${error}]]</div>
+<div th:if="${error}" th:text="${error}">[[${error}]]</div>
 
-<!-- Formulario de filtro -->
+<!-- filtro -->
 <form method="get" th:action="@{/historial/usuarios}">
-    <input type="text" name="usuarioCorreo" placeholder="Buscar por correo" th:value="${usuarioCorreo}">
-    <button type="submit">Buscar</button>
+    <input type="text" name="usuarioCorreo" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
+    <button type="submit">Búsqueda</button>
 </form>
 
 <!-- Tabla de resultados -->
-<table border="1">
+<table border="2">
     <thead>
         <tr>
             <th>ID</th>
@@ -42,7 +41,7 @@
 
 <!-- Paginación -->
 <div>
-    <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}">Página X de Y</span>
+    <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
 
     <div>
         <a th:if="${page > 0}" th:href="@{|/historial/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}">Anterior</a>

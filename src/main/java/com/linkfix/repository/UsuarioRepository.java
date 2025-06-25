@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.linkfix.dto.ListadoUsuariosDTO;
 import com.linkfix.dto.TecnicoListadoDTO;
 import com.linkfix.entity.UsuarioEntity;
 
@@ -99,6 +100,16 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long>
         @Param("horaFin") LocalTime horaFin,
         Pageable pageable
     );
+
+    @Query(value = """
+            SELECT u.id, u.idPersona, u.correo, '' AS roles, u.calificacion, e.nombre AS estado, u.fecha_registro, p.dni, p.ruc, p.nombre, p.apellidos, p.direccion, p.telefono, p.idUbigeo
+            FROM usuario u
+            LEFT JOIN persona p ON p.id = u.idPersona
+            LEFT JOIN estado e ON e.id = u.idEstado
+            WHERE u.correo LIKE CONCAT('%', :correo, '%')
+            """,
+            nativeQuery = true)
+    Page<ListadoUsuariosDTO> listarUsuarios(@Param("correo") String correo, Pageable pageable);
 
 }
 

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.linkfix.dto.ListadoUsuariosDTO;
 import com.linkfix.dto.TecnicoListadoDTO;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.RolEntity;
@@ -20,6 +21,7 @@ public interface UsuarioService {
     public UsuarioEntity findById(Long id);
     public UsuarioEntity findByEmailToken(String token);
     public UsuarioEntity generarToken(UsuarioEntity u);
+    public Page<ListadoUsuariosDTO> listarUsuarios(String correo, Pageable pageable);
     
     //mapeador
     public UsuarioDTO toSessionUsuarioDTO(UsuarioEntity usuario, List<RolEntity> roles);
