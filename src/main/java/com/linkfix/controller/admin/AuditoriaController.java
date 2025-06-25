@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,7 +19,8 @@ import com.linkfix.service.aud.AUDUsuarioHistorialService;
 
 import jakarta.servlet.http.HttpSession;
 
-@RequestMapping("/historial/")
+@Controller
+@RequestMapping("/historial")
 public class AuditoriaController {
 
     @Autowired
@@ -67,7 +69,7 @@ public class AuditoriaController {
         model.addAttribute("totalElements", historialPage.getTotalElements()); 
 
 
-        return "auditoria/listaHistorialUsuarios";
+        return "auditoria/historialUsuarios";
     }
 
     //
