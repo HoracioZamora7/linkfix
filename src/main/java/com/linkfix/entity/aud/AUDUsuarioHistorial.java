@@ -52,7 +52,7 @@ public class AUDUsuarioHistorial {
     private Long idUsuarioUltimaEdicion;
 
     @Column(name = "correoUsuarioUltimaEdicion")
-    private Long correoUsuarioUltimaEdicion;
+    private String correoUsuarioUltimaEdicion;
 
     @Column(name = "idPersona")
     private Long idPersona;

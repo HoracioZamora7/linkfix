@@ -29,12 +29,13 @@
         </tr>
     </thead>
     <tbody>
-        <tr th:each="item : ${historialPage.content}">
+        <tr th:each="item : ${historialPage}">
             <td th:text="${item.idUsuario}">ID</td>
             <td th:text="${item.correo}">Correo</td>
             <td th:text="${item.roles}">Roles</td>
             <td th:text="${item.nombreEstado}">Estado</td>
-            <td th:text="${#dates.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+            <td th:text="${#temporals.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+
         </tr>
     </tbody>
 </table>

@@ -1,5 +1,8 @@
 package com.linkfix.controller.admin;
 
+import java.util.logging.Logger;
+
+import org.hibernate.engine.jdbc.env.internal.LobCreationLogging_.logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,8 +32,10 @@ public class AuditoriaController {
     @Autowired
     private UsuarioRolService usuarioRolService;
 
+    private static Logger logger = new Logger;
+
     @GetMapping("/usuarios")
-    public String listarTodos(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model, HttpSession session, RedirectAttributes redirectAttributes, @RequestParam(value = "usuarioCorreo", defaultValue = "") String correo) {
+    public String listarHistorialUsuarios(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, Model model, HttpSession session, RedirectAttributes redirectAttributes, @RequestParam(value = "usuarioCorreo", required = false) String correo) {
         
         if(sesionIsValid(session) == false || isAdmin(session)==false){
             return handleSesionInvalida(redirectAttributes);
@@ -39,11 +44,11 @@ public class AuditoriaController {
         Pageable pageable = PageRequest.of(page, size);
         Page<AUDUsuarioHistorial> historialPage;
 
-        if(correo==""){
+        if(correo==null || correo.trim().isEmpty()){
             historialPage = historialService.findAll(pageable);
-            
         } 
         else{
+            logger.info("correo en else"+correo);
             historialPage = historialService.findByCorreo(correo, pageable);
             model.addAttribute("usuarioCorreo", correo);
         }
