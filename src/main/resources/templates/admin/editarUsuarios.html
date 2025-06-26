@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Usuario</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/estilos.css}">
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">Editar Usuario</h2>
+
+    <form th:action="@{/admin/usuarios/editar/guardar}" th:object="${usuarioDTO}" method="post">
+        <input type="hidden" th:field="*{id}" />
+
+        <div class="mb-3">
+            <label for="correo" class="form-label">Correo:</label>
+            <input type="email" id="correo" th:field="*{correo}" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono:</label>
+            <input type="text" id="telefono" th:field="*{telefono}" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="direccion" class="form-label">Dirección:</label>
+            <input type="text" id="direccion" th:field="*{direccion}" class="form-control">
+        </div>
+
+        <!-- Departamento -->
+        <div class="mb-3">
+            <label for="departamento" class="form-label">Departamento:</label>
+            <select id="departamento" name="departamento" class="form-select" required>
+                <option value="">Seleccione departamento</option>
+                <option th:each="dep : ${departamentos}" th:value="${dep.id}" th:text="${dep.name}"></option>
+            </select>
+        </div>
+
+        <!-- Provincia -->
+        <div class="mb-3">
+            <label for="provincia" class="form-label">Provincia:</label>
+            <select id="provincia" name="provincia" class="form-select" required>
+                <option value="">Seleccione provincia</option>
+            </select>
+        </div>
+
+        <!-- Distrito -->
+        <div class="mb-3">
+            <label for="distrito" class="form-label">Distrito:</label>
+            <select id="distrito" th:field="*{ubigeo}" name="ubigeoId" class="form-select" required>
+                <option value="">Seleccione distrito</option>
+            </select>
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            <a th:href="@{/admin/usuarios}" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const departamentoSelect = document.getElementById("departamento");
+        const provinciaSelect = document.getElementById("provincia");
+        const distritoSelect = document.getElementById("distrito");
+
+        const selectedProvinciaId = [[${usuarioDTO.provinciaId}]];
+        const selectedDistritoId = [[${usuarioDTO.ubigeo}]];
+
+        // Cargar provincias si ya hay un departamento seleccionado
+        if (departamentoSelect.value !== "") {
+            fetch(`/api/provincia/listarPorDepartamento?departmentId=${departamentoSelect.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    provinciaSelect.innerHTML = '<option value="">Seleccione provincia</option>';
+                    data.forEach(p => {
+                        const selected = p.id === selectedProvinciaId ? "selected" : "";
+                        provinciaSelect.innerHTML += `<option value="${p.id}" ${selected}>${p.name}</option>`;
+                    });
+
+                    if (provinciaSelect.value !== "") {
+                        fetch(`/api/distrito/listarPorProvincia?provinceId=${provinciaSelect.value}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                distritoSelect.innerHTML = '<option value="">Seleccione distrito</option>';
+                                data.forEach(d => {
+                                    const selected = d.id === selectedDistritoId ? "selected" : "";
+                                    distritoSelect.innerHTML += `<option value="${d.id}" ${selected}>${d.name}</option>`;
+                                });
+                            });
+                    }
+                });
+        }
+
+        departamentoSelect.addEventListener("change", function () {
+            fetch(`/api/provincia/listarPorDepartamento?departmentId=${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    provinciaSelect.innerHTML = '<option value="">Seleccione provincia</option>';
+                    data.forEach(p => {
+                        provinciaSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                    });
+                    distritoSelect.innerHTML = '<option value="">Seleccione distrito</option>';
+                });
+        });
+
+        provinciaSelect.addEventListener("change", function () {
+            fetch(`/api/distrito/listarPorProvincia?provinceId=${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    distritoSelect.innerHTML = '<option value="">Seleccione distrito</option>';
+                    data.forEach(d => {
+                        distritoSelect.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                    });
+                });
+        });
+    });
+</script>
+</body>
+</html>

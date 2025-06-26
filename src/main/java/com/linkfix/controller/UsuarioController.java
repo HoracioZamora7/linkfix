@@ -29,6 +29,7 @@ import com.linkfix.service.UsuarioService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import static com.linkfix.util.SesionUtils.*;
 
 
 @Controller
@@ -66,12 +67,6 @@ public class UsuarioController {
 
     @Value("${api.token}")
     private String apiToken;
-
-    private boolean isAdmin(HttpSession session) 
-    {
-        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
-        return usuarioDTO != null && usuarioDTO.getRoles().contains(1); //si contiene el rol 1 (admin)
-    }
 
     @PostMapping("/registro")
     public String registrarUsuario(@ModelAttribute("usuario") UsuarioEntity usuario, Model model, RedirectAttributes redirectAttributes) {
@@ -361,17 +356,6 @@ public class UsuarioController {
         model.addAttribute("dias", diaService.findAll());
 
         return "/usuario/disponibilidad";
-    }
-
-    private boolean sesionIsValid(HttpSession httpSession)
-    {
-        return httpSession.getAttribute("logueado") != null; //si es null la sesion es invalida
-    }
-
-    private String handleSesionInvalida(RedirectAttributes redirectAttributes)
-    {
-        redirectAttributes.addFlashAttribute("error", "Sesión inválida");
-        return "redirect:/index";
     }
 
 

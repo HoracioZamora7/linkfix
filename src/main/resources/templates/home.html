@@ -46,40 +46,46 @@
                         <strong>Usuario:</strong>
                         <span class="text-dark" th:text="${session.logueado.correo}">correo@ejemplo.com</span>
                     </p>
-
+                    <!--
                     <p class="mb-2"><strong>Roles:</strong></p>
                     <ul class="list-group mb-3">
                         <li class="list-group-item" th:each="rol : ${session.logueado.nombresRoles}" th:text="${rol}">Rol</li>
-                    </ul>
-
-                    <a  class="btn btn-primary" th:href="@{/perfil}">Visitar perfil</a>
-                    <a th:href="@{/servicio/buscar}" class="btn btn-primary">Buscar Técnicos</a>
-
-                    <!-- Botón solo si tiene rol de administrador -->
-                    <a th:if="${session.logueado.roles.contains(1)}"
-                       th:href="@{/solicitudes/lista}"
-                       class="btn btn-outline-success-custom mb-3 d-block">
-                        Validar Técnicos
-                    </a>
+                    </ul>-->
                     
-                    <a th:if="${session.logueado.roles.contains(1)}"
-                       th:href="@{/historial/usuarios}"
-                       class="btn btn-outline-success-custom mb-3 d-block">
-                        Historial cambios
-                    </a>
+                    <hr>
+                    <br>
 
-                    <a th:if="${session.logueado.roles.contains(1)}"
-                       th:href="@{/admin/usuarios}"
-                       class="btn btn-outline-success-custom mb-3 d-block">
-                        Listado de usuarios
-                    </a>
+                    <div class="d-grid gap-2 mb-3">
+                        <a class="btn btn-primary" th:href="@{/perfil}">Visitar perfil</a>
+                        <a class="btn btn-primary" th:href="@{/servicio/buscar}">Buscar Técnicos</a>
 
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn btn-outline-danger btn-outline-danger-smooth w-100">
-                            Cerrar sesión
-                        </button>
-                    </form>
+                        <!-- Botón solo si tiene rol de administrador -->
+                        <a th:if="${session.logueado.roles.contains(1)}"
+                        th:href="@{/solicitudes/lista}"
+                        class="btn btn-outline-success-custom">
+                            Validar Técnicos
+                        </a>
+
+                        <a th:if="${session.logueado.roles.contains(1)}"
+                        th:href="@{/historial/usuarios}"
+                        class="btn btn-outline-success-custom">
+                            Historial cambios
+                        </a>
+
+                        <a th:if="${session.logueado.roles.contains(1)}"
+                        th:href="@{/admin/usuarios}"
+                        class="btn btn-outline-success-custom">
+                            Listado de usuarios
+                        </a>
+
+                        <form th:action="@{/logout}" method="post" class="mt-2">
+                            <button type="submit" class="btn btn-outline-danger btn-outline-danger-smooth w-100">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
+
 
                 <!-- div por si no hay sesión válida -->
                 <div th:if="${session.logueado == null and session.mostrarMensajeInvalido == true}">

@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -16,9 +18,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.linkfix.dto.ListadoUsuariosDTO;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.RolEntity;
+import com.linkfix.service.DepartamentoService;
 import com.linkfix.service.UsuarioRolService;
 import com.linkfix.service.UsuarioService;
+import com.linkfix.util.SesionUtils;
 
+import static com.linkfix.util.SesionUtils.*;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
@@ -30,6 +35,9 @@ public class AdminUsuarioController {
 
     @Autowired
     private UsuarioRolService usuarioRolService;
+
+    @Autowired
+    private DepartamentoService departamentoService;
 
     private static final Logger logger = LoggerFactory.getLogger(AdminUsuarioController.class);
 
@@ -44,8 +52,8 @@ public class AdminUsuarioController {
         if(correo==null) correo="";
         Page<ListadoUsuariosDTO> usuarioPage = usuarioService.listarUsuarios(correo, pageable);
         model.addAttribute("usuarioCorreo", correo);
-        logger.info("correo: "+correo);
-        logger.info(usuarioPage.getContent().toString());
+/*         logger.info("correo: "+correo);
+        logger.info(usuarioPage.getContent().toString()); */
         
         for(ListadoUsuariosDTO elemento: usuarioPage.getContent()){
             StringBuilder nombreRoles = new StringBuilder();
@@ -70,22 +78,39 @@ public class AdminUsuarioController {
         return "/admin/listarUsuarios";
     }
 
+    @PostMapping("/usuarios/editar")
+    public String editarUsuarioPost(@RequestParam("id") Long id, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
+        }
 
 
-    private boolean sesionIsValid(HttpSession httpSession)
-    {
-        return httpSession.getAttribute("logueado") != null; //si es null la sesion es invalida
+        
+        UsuarioDTO usuario = usuarioService.toUsuarioDTOById(id);
+        model.addAttribute("usuarioDTO", usuario);
+        model.addAttribute("departamentos", departamentoService.findAll());
+
+        return "admin/editarUsuarios"; //
     }
 
-    private String handleSesionInvalida(RedirectAttributes redirectAttributes)
+    @PostMapping("/usuarios/editar/guardar")
+    public String actualizarUsuario(@ModelAttribute("usuarioDTO") UsuarioDTO usuarioDTO, Model model, HttpSession session, RedirectAttributes redirectAttributes)
     {
-        redirectAttributes.addFlashAttribute("error", "Sesión inválida");
-        return "redirect:/index";
+        try {
+
+            if (!sesionIsValid(session)) {
+                return handleSesionInvalida(redirectAttributes);
+            }
+            UsuarioDTO sessionUsuarioDTO= (UsuarioDTO) session.getAttribute("logueado");
+            usuarioService.actualizarPerfil(usuarioDTO, sessionUsuarioDTO.getId());
+            return "redirect:/admin/usuarios";
+        
+        } catch (Exception e) {
+            redirectAttributes.addAttribute("error", "error al guardar usuario.");
+            return "redirect:/admin/usuarios";
+        }
     }
 
-    private boolean isAdmin(HttpSession session) 
-    {
-        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
-        return usuarioDTO != null && usuarioDTO.getRoles().contains(1); //si contiene el rol 1 (admin)
-    }
+    
+
 }

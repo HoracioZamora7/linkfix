@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.linkfix.controller.UsuarioController;
-import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.RolEntity;
 import com.linkfix.entity.aud.AUDUsuarioHistorial;
 import com.linkfix.service.UsuarioRolService;
 import com.linkfix.service.aud.AUDUsuarioHistorialService;
+import static com.linkfix.util.SesionUtils.*;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -80,21 +80,4 @@ public class AuditoriaController {
         return "admin/auditoria/historialUsuarios";
     }
 
-    //
-    private boolean sesionIsValid(HttpSession httpSession)
-    {
-        return httpSession.getAttribute("logueado") != null; //si es null la sesion es invalida
-    }
-
-    private String handleSesionInvalida(RedirectAttributes redirectAttributes)
-    {
-        redirectAttributes.addFlashAttribute("error", "Sesión inválida");
-        return "redirect:/index";
-    }
-
-    private boolean isAdmin(HttpSession session) 
-    {
-        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
-        return usuarioDTO != null && usuarioDTO.getRoles().contains(1); //si contiene el rol 1 (admin)
-    }
 }

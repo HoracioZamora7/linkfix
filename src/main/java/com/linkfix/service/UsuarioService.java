@@ -22,9 +22,10 @@ public interface UsuarioService {
     public UsuarioEntity findByEmailToken(String token);
     public UsuarioEntity generarToken(UsuarioEntity u);
     public Page<ListadoUsuariosDTO> listarUsuarios(String correo, Pageable pageable);
-    
+    public UsuarioDTO toUsuarioDTOById(Long id);
     //mapeador
     public UsuarioDTO toSessionUsuarioDTO(UsuarioEntity usuario, List<RolEntity> roles);
+    public boolean actualizarUsuario(UsuarioEntity usuarioEntity, Long idUsuarioUltimaEdicion);
 
     public Page<TecnicoListadoDTO> listarTecnicosDisponibles(String idUbigeo, Long idElectrodomestico, Integer idDia, LocalTime horaInicio, LocalTime horaFIn, Pageable pageable);
 }

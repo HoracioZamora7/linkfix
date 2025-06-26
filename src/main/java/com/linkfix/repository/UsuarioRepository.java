@@ -101,19 +101,20 @@ public interface UsuarioRepository extends JpaRepository<UsuarioEntity, Long>
         Pageable pageable
     );
 
-    @Query(value = """
-            SELECT u.id, u.idPersona, u.correo, '' AS roles, u.calificacion, e.nombre AS estado, u.fecha_registro, p.dni, p.ruc, p.nombre, p.apellidos, p.direccion, p.telefono, p.idUbigeo
+   @Query(value = """
+            SELECT u.id, u.idPersona, u.correo, '' AS roles, u.calificacion, e.nombre, u.fecha_registro, p.dni, p.ruc, p.nombre, p.apellidos, p.direccion, p.telefono, p.idUbigeo
             FROM usuario u
             LEFT JOIN persona p ON p.id = u.idPersona
             LEFT JOIN estado e ON e.id = u.idEstado
             WHERE u.correo LIKE CONCAT('%', :correo, '%')
             """,
             nativeQuery = true)
-    Page<ListadoUsuariosDTO> listarUsuarios(@Param("correo") String correo, Pageable pageable);
-
+            Page<ListadoUsuariosDTO> listarUsuarios(@Param("correo") String correo, Pageable pageable);
+            
 }
-
-
+        
+        
+        /*     @Query("SELECT u.id, u.persona.id, ''  FROM UsuarioEntity u WHERE u.correo LIKE CONCAT('%', :correo, '%')") */
 
 /* queries antiguas */
 

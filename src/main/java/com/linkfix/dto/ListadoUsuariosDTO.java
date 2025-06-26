@@ -1,5 +1,5 @@
 package com.linkfix.dto;
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,7 +17,7 @@ public class ListadoUsuariosDTO {
     private String roles;
     private float calificacion;
     private String estado;
-    private LocalDateTime fecha_registro;
+    private Timestamp fecha_registro;
     private String dni;
     private String ruc;
     private String nombre;

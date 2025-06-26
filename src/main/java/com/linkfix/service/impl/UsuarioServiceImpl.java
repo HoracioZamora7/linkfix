@@ -160,6 +160,22 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
     }
 
+    ///temporal
+    @Override
+    public boolean actualizarUsuario(UsuarioEntity usuarioEntity, Long idUsuarioUltimaEdicion) {
+        try {
+            usuarioEntity.setIdUsuarioUltimaEdicion(idUsuarioUltimaEdicion);
+            
+            personaService.save(usuarioEntity.getPersona());
+            repository.save(usuarioEntity);
+
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     @Override
     public UsuarioEntity findByEmailToken(String token) {
         return repository.findByEmailToken(token);
@@ -198,5 +214,35 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         
         return repository.listarUsuarios(correo, pageable);
+    }
+
+    @Override
+    public UsuarioDTO toUsuarioDTOById(Long id) {
+        UsuarioEntity usuario = repository.findById(id).orElse(null);
+        UsuarioDTO dto = new UsuarioDTO();
+        
+        if(usuario!=null)
+        {
+        dto.setId(usuario.getId());
+        dto.setCorreo(usuario.getCorreo());
+        dto.setNombre(usuario.getPersona().getNombre());
+        dto.setApellidos(usuario.getPersona().getApellidos());
+        dto.setDni(usuario.getPersona().getDni());
+        dto.setDireccion(usuario.getPersona().getDireccion());
+        dto.setUbigeo(usuario.getPersona().getUbigeo().getId());
+        dto.setCalificacion(usuario.getCalificacion());
+        dto.setFecha_registro(usuario.getFecha_registro());
+        dto.setTelefono(usuario.getPersona().getTelefono());
+        dto.setRuc(usuario.getPersona().getRuc());
+        DepartamentoEntity departamento = departamentoService.findById(usuario.getPersona().getUbigeo().getDepartmentId()).orElse(null);
+        ProvinciaEntity provincia = provinciaService.findById(usuario.getPersona().getUbigeo().getProvinceId()).orElse(null);
+        dto.setDepartamento(departamento != null ? departamento.getName() : null);
+        dto.setProvincia(provincia != null ? provincia.getName() : null);
+        dto.setDistrito(usuario.getPersona().getUbigeo().getName());
+        dto.setDepartamentoId(dto.getUbigeo().substring(0, 2));
+        dto.setProvinciaId(dto.getUbigeo().substring(0, 4));
+        }
+        
+        return dto;
     }
 }

@@ -6,48 +6,73 @@
 </head>
 <body>
 
-<h2>Historial de Usuarios</h2>
+    <h2>Historial de Usuarios</h2>
 
-<div th:if="${error}" th:text="${error}">[[${error}]]</div>
+    <div th:if="${error}" th:text="${error}">[[${error}]]</div>
 
-<!-- filtro -->
-<form method="get" th:action="@{/historial/usuarios}">
-    <input type="text" name="usuarioCorreo" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
-    <button type="submit">Búsqueda</button>
-</form>
+    <!-- filtro -->
+    <form method="get" th:action="@{/historial/usuarios}">
+        <input type="text" name="usuarioCorreo" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
+        <button type="submit">Búsqueda</button>
+    </form>
 
-<!-- Tabla de resultados -->
-<table border="2">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Correo</th>
-            <th>Roles</th>
-            <th>Estado</th>
-            <th>Fecha cambio</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr th:each="item : ${historialPage}">
-            <td th:text="${item.idUsuario}">ID</td>
-            <td th:text="${item.correo}">Correo</td>
-            <td th:text="${item.roles}">Roles</td>
-            <td th:text="${item.nombreEstado}">Estado</td>
-            <td th:text="${#temporals.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha</td>
+    <!-- Tabla de resultados -->
+    <table border="2">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Correo</th>
 
-        </tr>
-    </tbody>
-</table>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>DNI</th>
+                <th>RUC</th>
+                <th>Ubigeo</th>
+                <th>Telefono</th>
+                <th>Dirección</th>
+                <th>Roles</th>
+                <th>Estado</th>
+                <th>Fecha de registro del usuario</th>
+                <th>Fecha cambio</th>
+                <th>Usuario que hizo realizó la modificación</th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="item : ${historialPage}">
+                <td th:text="${item.idUsuario}">ID</td>
+                <td th:text="${item.correo}">Correo</td>
+                <td th:text="${item.nombre}">Nombre</td>
+                <td th:text="${item.apellidos}">apellidos</td>
+                <td th:text="${item.dni}">dni</td>
+                <td th:text="${item.ruc} ?: '-'">ruc</td>
+                <td th:text="${item.idUbigeo}">ruc</td>
+                <td th:text="${item.telefono}">telefono</td>
+                <td th:text="${item.direccion}">direccion</td>
+                <td th:text="${item.roles}">Roles</td>
+                <td th:text="${item.nombreEstado}">Estado</td>
+                <td th:text="${#temporals.format(item.fechaRegistro, 'dd/MM/yyyy HH:mm')}">Fecha de registro</td>
+                <td th:text="${#temporals.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha del cambio</td>
+                <td th:text="${item.correoUsuarioUltimaEdicion}">Correo</td>
 
-<!-- Paginación -->
-<div>
-    <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
 
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
     <div>
-        <a th:if="${page > 0}" th:href="@{|/historial/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}">Anterior</a>
-        <a th:if="${page + 1 < totalPages}" th:href="@{|/historial/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}">Siguiente</a>
+        <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
+
+        <div>
+            <a th:if="${page > 0}" th:href="@{|/historial/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}">Anterior</a>
+            <a th:if="${page + 1 < totalPages}" th:href="@{|/historial/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}">Siguiente</a>
+        </div>
     </div>
-</div>
+
+    <div class="mt-3 text-center">
+        <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
+    </div>
 
 </body>
 </html>
