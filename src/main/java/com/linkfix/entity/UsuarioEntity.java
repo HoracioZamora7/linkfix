@@ -6,9 +6,6 @@ import lombok.Builder;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
-import org.springframework.cglib.core.Local;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

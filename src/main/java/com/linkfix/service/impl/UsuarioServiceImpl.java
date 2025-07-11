@@ -1,5 +1,4 @@
 package com.linkfix.service.impl;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -8,6 +7,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +21,9 @@ import com.linkfix.entity.ProvinciaEntity;
 import com.linkfix.entity.RolEntity;
 import com.linkfix.entity.UbigeoDistritosEntity;
 import com.linkfix.entity.UsuarioEntity;
+import com.linkfix.entity.aud.AUDUsuarioHistorial;
 import com.linkfix.repository.UsuarioRepository;
+import com.linkfix.repository.aud.AUDUsuarioHistorialRepository;
 import com.linkfix.service.DepartamentoService;
 import com.linkfix.service.EmailService;
 import com.linkfix.service.PersonaService;
@@ -55,6 +57,12 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private AUDUsuarioHistorialRepository audRepository;
+
+    @Value("${app.url.base}")
+    private String appBaseUrl;
+
     @Override
     public List<UsuarioEntity> listAll() 
     {
@@ -68,7 +76,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         u.setContrasena(passwordEncoder.encode(u.getContrasena()));
         u.setFecha_registro(LocalDateTime.now());
         u.setEmailToken(UUID.randomUUID().toString());
-        u.setEmailTokenFechaExpiracion(LocalDateTime.now().plusMinutes(1));
+        u.setEmailTokenFechaExpiracion(LocalDateTime.now().plusMinutes(10));
 
         return generarToken(u);
     }
@@ -153,6 +161,31 @@ public class UsuarioServiceImpl implements UsuarioService {
             personaService.save(usuarioEntity.getPersona());
             repository.save(usuarioEntity);
 
+            // Crear historial
+            AUDUsuarioHistorial historial = new AUDUsuarioHistorial();
+            historial.setIdUsuario(usuarioEntity.getId());
+            historial.setCorreo(usuarioEntity.getCorreo());
+            historial.setIdEstado(usuarioEntity.getEstado().getId());
+            historial.setNombreEstado(usuarioEntity.getEstado().getNombre());
+            historial.setFechaRegistro(usuarioEntity.getFecha_registro());
+            historial.setEmailToken(usuarioEntity.getEmailToken());
+            historial.setEmailTokenFechaExpiracion(usuarioEntity.getEmailTokenFechaExpiracion());
+            historial.setIdUsuarioUltimaEdicion(idUsuarioUltimaEdicion);
+            UsuarioEntity usuarioEntity2=repository.findById(idUsuarioUltimaEdicion).orElse(null);
+            historial.setCorreoUsuarioUltimaEdicion(usuarioEntity2.getCorreo());
+            historial.setIdPersona(usuarioEntity.getPersona().getCodigo());
+            historial.setNombre(usuarioEntity.getPersona().getNombre());
+            historial.setApellidos(usuarioEntity.getPersona().getApellidos());
+            historial.setDni(usuarioEntity.getPersona().getDni());
+            historial.setRuc(usuarioEntity.getPersona().getRuc());
+            historial.setIdUbigeo(usuarioEntity.getPersona().getUbigeo().getId());
+            historial.setTelefono(usuarioEntity.getPersona().getTelefono());
+            historial.setDireccion(usuarioEntity.getPersona().getDireccion());
+            historial.setFechaCambio(LocalDateTime.now());
+            audRepository.save(historial);
+
+
+
             return true;
 
         } catch (Exception e) {
@@ -184,18 +217,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     public UsuarioEntity generarToken(UsuarioEntity u) {
         u.setEmailToken(UUID.randomUUID().toString());
-        u.setEmailTokenFechaExpiracion(LocalDateTime.now().plusMinutes(1));
+        u.setEmailTokenFechaExpiracion(LocalDateTime.now().plusMinutes(10));
         //email sender sencillo
         //emailService.sendEmail(u.getCorreo(), "Token", "http://localhost:8080/registrar/verificar-email?token="+ u.getEmailToken());
 
         Map<String, String> variables = new HashMap<>();
         variables.put("username", u.getPersona().getApellidos()+", " + u.getPersona().getNombre());
-        variables.put("enlaceConfirmacion", "http://localhost:8080/registrar/verificar-email?token="+u.getEmailToken());
+        variables.put("enlaceConfirmacion", appBaseUrl+"/registrar/verificar-email?token="+u.getEmailToken());
 
         try {
             emailService.sendHtmlEmail(u.getCorreo(), "Verificación de cuenta", "templates/email/templateMailConfirmacion.html", variables);
         } catch (MessagingException e) {
-            emailService.sendEmail(u.getCorreo(), "Token", "http://localhost:8080/registrar/verificar-email?token="+ u.getEmailToken());
+            emailService.sendEmail(u.getCorreo(), "Token", appBaseUrl+"/registrar/verificar-email?token="+ u.getEmailToken());
             e.printStackTrace();
         }
         

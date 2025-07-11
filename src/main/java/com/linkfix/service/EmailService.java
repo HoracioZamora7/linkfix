@@ -26,6 +26,7 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String mailRemitente;
 
+    
     @Async
     public void sendEmail(String to, String asunto, String body){
         try {

@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TecnicoListadoDTO {
-    private Long idUsuario;
+    private Long id;
     private String nombreCompleto;
     private String correo;
     private Float calificacion;
@@ -18,4 +18,6 @@ public class TecnicoListadoDTO {
     private Time horaInicio;
     private Time horaFin;
     private int tieneEspecialidad;
+
+    //podría haber una clase dto para persona, así evitamos campos repetidos aquí y en los demás dtos
 }

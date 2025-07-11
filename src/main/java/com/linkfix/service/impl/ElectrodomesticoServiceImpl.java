@@ -21,4 +21,10 @@ public class ElectrodomesticoServiceImpl implements ElectrodomesticoService {
        return reposity.findAll();
     }
 
+
+    @Override
+    public ElectrodomesticoEntity findById(Long id) {
+        return reposity.findById(id).orElse(null);
+    }
+
 }

@@ -30,4 +30,5 @@ public class AUDUsuarioHistorialService {
     {
         return repository.findByCorreo(correo, pageable);
     }
+
 }

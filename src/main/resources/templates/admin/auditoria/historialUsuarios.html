@@ -3,75 +3,83 @@
 <head>
     <title>Historial de Usuarios</title>
     <meta charset="UTF-8" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
-    <h2>Historial de Usuarios</h2>
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
 
-    <div th:if="${error}" th:text="${error}">[[${error}]]</div>
+    <div class="container mt-4">
+        <h2>Historial de Usuarios</h2>
 
-    <!-- filtro -->
-    <form method="get" th:action="@{/historial/usuarios}">
-        <input type="text" name="usuarioCorreo" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
-        <button type="submit">Búsqueda</button>
-    </form>
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <!-- Tabla de resultados -->
-    <table border="2">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Correo</th>
+        <!-- Filtro de búsqueda -->
+        <form method="get" th:action="@{/historial/usuarios}" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="usuarioCorreo" class="form-control" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
+                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+            </div>
+        </form>
 
-                <th>Nombre</th>
-                <th>Apellidos</th>
-                <th>DNI</th>
-                <th>RUC</th>
-                <th>Ubigeo</th>
-                <th>Telefono</th>
-                <th>Dirección</th>
-                <th>Roles</th>
-                <th>Estado</th>
-                <th>Fecha de registro del usuario</th>
-                <th>Fecha cambio</th>
-                <th>Usuario que hizo realizó la modificación</th>
-                
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="item : ${historialPage}">
-                <td th:text="${item.idUsuario}">ID</td>
-                <td th:text="${item.correo}">Correo</td>
-                <td th:text="${item.nombre}">Nombre</td>
-                <td th:text="${item.apellidos}">apellidos</td>
-                <td th:text="${item.dni}">dni</td>
-                <td th:text="${item.ruc} ?: '-'">ruc</td>
-                <td th:text="${item.idUbigeo}">ruc</td>
-                <td th:text="${item.telefono}">telefono</td>
-                <td th:text="${item.direccion}">direccion</td>
-                <td th:text="${item.roles}">Roles</td>
-                <td th:text="${item.nombreEstado}">Estado</td>
-                <td th:text="${#temporals.format(item.fechaRegistro, 'dd/MM/yyyy HH:mm')}">Fecha de registro</td>
-                <td th:text="${#temporals.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha del cambio</td>
-                <td th:text="${item.correoUsuarioUltimaEdicion}">Correo</td>
-
-
-            </tr>
-        </tbody>
-    </table>
-
-    <!-- Paginación -->
-    <div>
-        <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
-
-        <div>
-            <a th:if="${page > 0}" th:href="@{|/historial/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}">Anterior</a>
-            <a th:if="${page + 1 < totalPages}" th:href="@{|/historial/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}">Siguiente</a>
+        <!-- Tabla de resultados -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Correo</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>DNI</th>
+                        <th>RUC</th>
+                        <th>Ubigeo</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Roles</th>
+                        <th>Estado</th>
+                        <th>Fecha de registro</th>
+                        <th>Fecha de cambio</th>
+                        <th>Usuario que realizó el cambio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${historialPage}">
+                        <td th:text="${item.idUsuario}">ID</td>
+                        <td th:text="${item.correo}">Correo</td>
+                        <td th:text="${item.nombre}">Nombre</td>
+                        <td th:text="${item.apellidos}">Apellidos</td>
+                        <td th:text="${item.dni}">DNI</td>
+                        <td th:text="${item.ruc} ?: '-'">RUC</td>
+                        <td th:text="${item.idUbigeo}">Ubigeo</td>
+                        <td th:text="${item.telefono}">Teléfono</td>
+                        <td th:text="${item.direccion}">Dirección</td>
+                        <td th:text="${item.roles}">Roles</td>
+                        <td th:text="${item.nombreEstado}">Estado</td>
+                        <td th:text="${#temporals.format(item.fechaRegistro, 'dd/MM/yyyy HH:mm')}">Fecha registro</td>
+                        <td th:text="${#temporals.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha cambio</td>
+                        <td th:text="${item.correoUsuarioUltimaEdicion}">Usuario que hizo el cambio</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-    </div>
 
-    <div class="mt-3 text-center">
-        <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center">
+            <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
+            <div>
+                <a th:if="${page > 0}" th:href="@{|/historial/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}" class="btn btn-outline-secondary btn-sm">Anterior</a>
+                <a th:if="${page + 1 < totalPages}" th:href="@{|/historial/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}" class="btn btn-outline-secondary btn-sm">Siguiente</a>
+            </div>
+        </div>
+
+        <!-- Botón de volver -->
+        <div class="mt-4 text-center">
+            <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
+        </div>
     </div>
 
 </body>

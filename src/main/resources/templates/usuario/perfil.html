@@ -1,15 +1,19 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
-    <title>Mi Perfil</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/font/bootstrap-icons.css}">
+    <title>Mi Perfil</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
     <style>
         body {
             background-color: #121212;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            margin-bottom: 2rem;
         }
 
         .card {
@@ -77,22 +81,27 @@
 </head>
 <body class="bg-dark text-white">
 
-<div class="container mt-5">
+<nav th:if="${session.logueado != null}">
+    <div th:replace="~{fragments/header :: navbar}"></div>
+</nav>
+
+<div class="container mt-4">
     <h2 class="mb-4 text-center"><i class="bi bi-person-circle"></i> Perfil</h2>
 
     <div class="card p-4">
         <div class="card-body">
-            <p><span class="info-label">Nombre:</span> <span th:text="${usuarioDTO.nombre}"></span></p>
-            <p><span class="info-label">Apellidos:</span> <span th:text="${usuarioDTO.apellidos}"></span></p>
-            <p><span class="info-label">DNI:</span> <span th:text="${usuarioDTO.dni}"></span></p>
-            <p><span class="info-label">Correo:</span> <span th:text="${usuarioDTO.correo}"></span></p>
-            <p><span class="info-label">Teléfono:</span> <span th:text="${usuarioDTO.telefono}"></span></p>
-            <p><span class="info-label">Dirección:</span> <span th:text="${usuarioDTO.direccion}"></span></p>
-            <p><span class="info-label">Ubigeo:</span> <span th:text="${usuarioDTO.ubigeo}"></span></p>
-            <p><span class="info-label">Departamento:</span> <span th:text="${usuarioDTO.departamento}"></span></p>
-            <p><span class="info-label">Provincia:</span> <span th:text="${usuarioDTO.provincia}"></span></p>
-            <p><span class="info-label">Distrito:</span> <span th:text="${usuarioDTO.distrito}"></span></p>
-            <p><span class="info-label">Fecha de Registro:</span> <span th:text="${#temporals.format(usuarioDTO.fecha_registro, 'yyyy-MM-dd HH:mm')}"></span></p>
+            <p><span class="info-label">Nombre:</span> <span class="text-white" th:text="${usuarioDTO.nombre}"></span></p>
+            <p><span class="info-label">Apellidos:</span> <span class="text-white" th:text="${usuarioDTO.apellidos}"></span></p>
+            <p><span class="info-label">DNI:</span> <span class="text-white" th:text="${usuarioDTO.dni}"></span></p>
+            <p><span class="info-label">Correo:</span> <span class="text-white" th:text="${usuarioDTO.correo}"></span></p>
+            <p><span class="info-label">Teléfono:</span> <span class="text-white" th:text="${usuarioDTO.telefono}"></span></p>
+            <p><span class="info-label">Dirección:</span> <span class="text-white" th:text="${usuarioDTO.direccion}"></span></p>
+            <p><span class="info-label">Ubigeo:</span> <span class="text-white" th:text="${usuarioDTO.ubigeo}"></span></p>
+            <p><span class="info-label">Departamento:</span> <span class="text-white" th:text="${usuarioDTO.departamento}"></span></p>
+            <p><span class="info-label">Provincia:</span> <span class="text-white" th:text="${usuarioDTO.provincia}"></span></p>
+            <p><span class="info-label">Distrito:</span> <span class="text-white" th:text="${usuarioDTO.distrito}"></span></p>
+            <p><span class="info-label">Fecha de Registro:</span>
+                <span th:text="${#temporals.format(usuarioDTO.fecha_registro, 'yyyy-MM-dd HH:mm')}"></span></p>
 
             <p class="mb-2 info-label"><i class="bi bi-shield-lock"></i> Roles:</p>
             <ul class="list-group mb-3">
@@ -101,14 +110,14 @@
 
             <hr>
 
-            <!-- solo visible para usuarios de rol técnico -->
+            <!-- Solo para técnicos -->
             <div th:if="${session.logueado.roles.contains(3)}">
                 <p th:if="${usuarioDTO.calificacion==0}">
                     Realiza más servicios para aumentar la calificación! (texto provisional)
                 </p>
                 <p><span class="info-label">Calificación:</span> <span th:text="${usuarioDTO.calificacion}"></span></p>
 
-                <!-- tabla de disponibilidad -->
+                <!-- Disponibilidad -->
                 <div th:if="${disponibilidad != null and !#lists.isEmpty(disponibilidad)}">
                     <table class="table table-dark table-striped table-hover">
                         <thead>
@@ -135,21 +144,17 @@
                     <a th:href="@{/perfil/disponibilidad}" class="btn btn-custom w-100"><i class="bi bi-pencil-square"></i> Registrar horario</a>
                 </div>
             </div>
-
         </div>
     </div>
 
     <hr>
 
-    <div class="mt-3 text-center">
+    <div class="text-center mt-3">
         <a th:href="@{/home}" class="btn btn-custom"><i class="bi bi-house-door-fill"></i> Volver al inicio</a>
-    </div>
-
-    <div class="mt-3 text-center">
         <a th:href="@{/perfil/editar}" class="btn btn-custom"><i class="bi bi-gear-fill"></i> Editar perfil</a>
     </div>
 </div>
 
-<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

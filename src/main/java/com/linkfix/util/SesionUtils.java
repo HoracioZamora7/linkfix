@@ -20,6 +20,12 @@ public final class SesionUtils {
         return "redirect:/index";
     }
 
+    public static String handleErrorToIndex(RedirectAttributes redirectAttributes, String mensaje)
+    {
+        redirectAttributes.addFlashAttribute("error", mensaje);
+        return "redirect:/index";
+    }
+
     public static boolean isAdmin(HttpSession session) 
     {
         UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");

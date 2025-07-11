@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
-    <title>Editar Perfil</title>
     <meta charset="UTF-8">
+    <title>Editar Perfil</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Bootstrap -->
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
-    <!-- Estilos personalizados -->
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
     <style>
         body {
             background-color: #121212;
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            margin-bottom: 2rem;
         }
 
         .container {
@@ -34,8 +37,7 @@
             font-weight: 500;
         }
 
-        .form-control,
-        .form-select {
+        .form-control, .form-select {
             background-color: #f8f9fa;
             color: #212529;
             border: 1px solid #ced4da;
@@ -44,8 +46,7 @@
             transition: border 0.2s, background-color 0.2s;
         }
 
-        .form-control:focus,
-        .form-select:focus {
+        .form-control:focus, .form-select:focus {
             border-color: #0d6efd;
             background-color: #ffffff;
             outline: none;
@@ -59,6 +60,7 @@
             transition: all 0.3s ease-in-out;
             margin-right: 10px;
         }
+
         .btn-save:hover {
             background-color: #198754;
             color: #ffffff;
@@ -70,14 +72,21 @@
             border: 1px solid #6c757d;
             transition: all 0.3s ease-in-out;
         }
+
         .btn-cancel:hover {
             background-color: #6c757d;
             color: #ffffff;
         }
     </style>
 </head>
-<body class="bg-dark text-white">
-<div class="container mt-5">
+<body>
+
+<!-- NAVBAR -->
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+
+<div class="container mt-4">
     <h2 class="mb-4 text-center">Editar Perfil</h2>
 
     <div class="card">
@@ -101,9 +110,7 @@
                 <label for="departamento" class="form-label">Departamento:</label>
                 <select id="departamento" name="departamento" class="form-select" required>
                     <option value="">Seleccione departamento</option>
-                    <option th:each="dep : ${departamentos}"
-                            th:value="${dep.id}"
-                            th:text="${dep.name}"></option>
+                    <option th:each="dep : ${departamentos}" th:value="${dep.id}" th:text="${dep.name}"></option>
                 </select>
             </div>
 
@@ -129,8 +136,8 @@
     </div>
 </div>
 
-<script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
-<script>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script th:inline="javascript">
     document.addEventListener("DOMContentLoaded", function () {
         const departamentoSelect = document.getElementById("departamento");
         const provinciaSelect = document.getElementById("provincia");

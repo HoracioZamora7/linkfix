@@ -5,6 +5,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.linkfix.entity.DiaEntity;
 import com.linkfix.entity.DisponibilidadEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.repository.DisponibilidadRepository;
@@ -82,6 +84,16 @@ public class DisponibilidadServiceImpl implements DisponibilidadService{
         repository.save(disponibilidad);
 
         return GUARDADO_CON_EXITO;
+    }
+
+    @Override
+    public List<DiaEntity> findDiasDisponiblesByTecnico(Long idTecnico) {
+       return repository.findDiasDisponiblesByTecnico(idTecnico);
+    }
+
+    @Override
+    public List<DisponibilidadEntity> findByTecnicoIdAndDiaId(Long idTecnico, int idDia) {
+        return repository.findByTecnicoIdAndDiaId(idTecnico, idDia);
     }
 
 }

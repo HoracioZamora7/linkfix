@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Solicitar Servicio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <!-- jQuery UI para datepicker -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+</head>
+<body>
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+
+<div class="container mt-5">
+    <h2 class="mb-4">Solicitud de Servicio</h2>
+
+    <form th:action="@{/servicio/solicitar/confirmar}" method="post">
+        <!-- Técnico -->
+        <div class="mb-3">
+            <label class="form-label"><strong>Técnico seleccionado:</strong></label>
+            <p th:text="${tecnico.nombre}">Nombre del Técnico</p>
+            <input type="hidden" name="idTecnico" th:value="${tecnico.id}" id="idTecnico"/>
+        </div>
+
+        <!-- Electrodoméstico -->
+        <div class="mb-3">
+            <label class="form-label"><strong>Electrodoméstico:</strong></label>
+            <th:block th:if="${electrodomestico == null}">
+                <p>No seleccionado</p>
+            </th:block>
+            <th:block th:if="${electrodomestico != null}">
+                <p th:text="${electrodomestico.nombre}">Nombre del Electrodoméstico</p>
+                <input type="hidden" name="idElectrodomestico" th:value="${electrodomestico.id}"/>
+            </th:block>
+        </div>
+
+        <!-- Fecha -->
+        <div class="mb-3">
+            <label for="fecha" class="form-label">Fecha de visita</label>
+            <input type="text" id="fecha" name="fecha" class="form-control" placeholder="Selecciona una fecha" required readonly>
+        </div>
+
+        <!-- hora  -->
+        <div class="mb-3">
+            <label for="hora" class="form-label">Hora disponible</label>
+            <select id="hora" name="hora" class="form-select" required>
+                <option value="" disabled selected>Seleccione una hora</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="comentario" class="form-label">¿Deseas brindarle más información al técnico?</label>
+            <textarea id="comentario" name="comentario" class="form-control" th:text="${comentario}"></textarea>
+        </div>
+
+        <!-- send -->
+        <div class="mb-3 text-center">
+            <button type="submit" class="btn btn-success">Confirmar solicitud</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+
+<!-- Script para DatePicker y carga de horas -->
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const diasHabilitados = /*[[${listaDisponibilidad}]]*/ [];
+
+    $(function() {
+        const diasPermitidos = diasHabilitados.map(d => d.idDia);
+
+        // Inicializa el datepicker
+        $("#fecha").datepicker({
+            dateFormat: "yy-mm-dd",
+            minDate: 0,
+            beforeShowDay: function(date) {
+                const day = date.getDay();
+                return [diasPermitidos.includes(day === 0 ? 7 : day)];
+            },
+            onSelect: function(dateText) {
+                const idTecnico = $("#idTecnico").val();
+                fetch(`/api/disponibilidad/horasDisponible?idTecnico=${idTecnico}&fecha=${dateText}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const horaSelect = $("#hora");
+                        horaSelect.empty().append('<option value="" disabled selected>Seleccione una hora</option>');
+                        data.forEach(hora => {
+                            horaSelect.append(`<option value="${hora}">${hora}</option>`);
+                        });
+                    });
+            }
+        });
+    });
+    /*]]>*/
+</script>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

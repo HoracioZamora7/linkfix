@@ -19,6 +19,7 @@ import com.linkfix.dto.ListadoUsuariosDTO;
 import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.RolEntity;
 import com.linkfix.service.DepartamentoService;
+import com.linkfix.service.EstadoService;
 import com.linkfix.service.UsuarioRolService;
 import com.linkfix.service.UsuarioService;
 import com.linkfix.util.SesionUtils;
@@ -38,6 +39,9 @@ public class AdminUsuarioController {
 
     @Autowired
     private DepartamentoService departamentoService;
+
+    @Autowired
+    private EstadoService estadoService;
 
     private static final Logger logger = LoggerFactory.getLogger(AdminUsuarioController.class);
 
@@ -89,6 +93,7 @@ public class AdminUsuarioController {
         UsuarioDTO usuario = usuarioService.toUsuarioDTOById(id);
         model.addAttribute("usuarioDTO", usuario);
         model.addAttribute("departamentos", departamentoService.findAll());
+        model.addAttribute("estados", estadoService.findAll());
 
         return "admin/editarUsuarios"; //
     }

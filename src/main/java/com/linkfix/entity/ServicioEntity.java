@@ -3,10 +3,7 @@ import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Builder;
-import java.util.Date;
-
 import jakarta.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
@@ -30,14 +27,14 @@ public class ServicioEntity {
 
     @ManyToOne
     @JoinColumn(name = "idTecnico")
-    private UsuarioEntity usuario1;
+    private UsuarioEntity tecnico;
 
     @ManyToOne
     @JoinColumn(name = "idElectrodomestico")
     private ElectrodomesticoEntity electrodomestico;
 
-    @Column(name = "fecha_solucitud")
-    private LocalDateTime fecha_solucitud;
+    @Column(name = "fecha_solicitud")
+    private LocalDateTime fecha_solicitud;
 
     @Column(name = "fecha_visita")
     private LocalDateTime fecha_visita;
@@ -51,5 +48,8 @@ public class ServicioEntity {
 
     @Column(name = "calificacion")
     private float calificacion;
+
+    @Column(name="comentario")
+    private String comentario;
 
 }

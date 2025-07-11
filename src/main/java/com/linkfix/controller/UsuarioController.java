@@ -18,6 +18,7 @@ import com.linkfix.entity.DisponibilidadEntity;
 import com.linkfix.entity.SolicitudRegistroEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.entity.UsuarioRolEntity;
+import com.linkfix.entity.aud.AUDUsuarioHistorial;
 import com.linkfix.service.DepartamentoService;
 import com.linkfix.service.DiaService;
 import com.linkfix.service.DisponibilidadService;
@@ -26,6 +27,8 @@ import com.linkfix.service.RolService;
 import com.linkfix.service.SolicitudRegistroService;
 import com.linkfix.service.UsuarioRolService;
 import com.linkfix.service.UsuarioService;
+import com.linkfix.service.aud.AUDUsuarioHistorialService;
+
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -34,6 +37,9 @@ import static com.linkfix.util.SesionUtils.*;
 
 @Controller
 public class UsuarioController {
+
+    @Autowired
+    private AUDUsuarioHistorialService audUsuarioHistorialService;
 
     @Autowired
     private UsuarioService usuarioService;
@@ -144,7 +150,7 @@ public class UsuarioController {
             }
 
 
-            redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado. Por favor, revise la bandeja de entrada de su correo. Tienes un minuto para verificar el correo");
+            redirectAttributes.addFlashAttribute("mensaje", "Usuario registrado. Por favor, revise la bandeja de entrada de su correo. Tienes diez minutos para verificar el correo");
             return "redirect:/index";
 
         } catch (Exception e) {
@@ -267,12 +273,13 @@ public class UsuarioController {
             usuarioDTO.setId(sessionUsuarioDTO.getId());
             usuarioService.actualizarPerfil(usuarioDTO, sessionUsuarioDTO.getId());
 
-            if(sessionUsuarioDTO.getCorreo()!=usuarioDTO.getCorreo())
+            /* if(sessionUsuarioDTO.getCorreo()!=usuarioDTO.getCorreo())
             {
                 session.invalidate();
                 redirectAttributes.addFlashAttribute("mensaje", "Correo actualizado. Inicie sesión nuevamente");
                 return "redirect:/index";
-            }
+            } */
+            
         } 
         catch (Exception e) {
             e.printStackTrace(); //cambiar por looger en el futuro 

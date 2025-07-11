@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmar Solicitud</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+<body>
+        <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+    <div class="container mt-5">
+        <h2>Confirmar Solicitud de Servicio</h2>
+
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+        <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
+
+        <form th:action="@{/servicio/confirmar}" method="post">
+            <input type="hidden" name="idServicio" th:value="${servicio.id}" />
+            <input type="hidden" id="idTecnico" th:value="${servicio.tecnico.id}" />
+
+            <!-- Cliente -->
+            <div class="mb-3">
+                <label class="form-label">Cliente:</label>
+                <p th:text="${servicio.usuario.persona.nombre} + ' ' + ${servicio.usuario.persona.apellidos}"></p>
+            </div>
+
+            <!-- Fecha y Hora  (se valida mediante llamadas a la api (revisar script abajo)) -->
+            <div class="mb-3">
+                <label for="fechaInicio" class="form-label">Fecha y hora de visita</label>
+                <input type="datetime-local" id="fechaInicio" name="fechaInicio"
+                       class="form-control" th:value="${fechaInicioString}" onchange="verificarConflicto()" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="fechaFin" class="form-label">Fecha y hora de finalización</label>
+                <input type="datetime-local" id="fechaFin" name="fechaFin"
+                       class="form-control" th:value="${fechaFinString}" onchange="verificarConflicto()" required>
+            </div>
+
+            <!-- Comentario -->
+            <div class="mb-3">
+                <label class="form-label">Comentario:</label>
+                <p th:text="${servicio.comentario}"></p>
+            </div>
+
+            <!-- Botones -->
+            <div class="text-center">
+                <button type="submit" class="btn btn-success" id="btnAceptar">Aceptar solicitud</button>
+                <a th:href="@{/servicio/rechazar(id=${servicio.id})}" class="btn btn-danger">Rechazar solicitud</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function verificarConflicto() {
+            const idTecnico = document.getElementById("idTecnico").value;
+            const fechaInicio = document.getElementById("fechaInicio").value;
+            const fechaFin = document.getElementById("fechaFin").value;
+
+            if (!fechaInicio || !fechaFin) return;
+
+            const url = `/api/servicio/verificar-conflicto?idTecnico=${idTecnico}&fechaInicio=${encodeURIComponent(fechaInicio)}&fechaFin=${encodeURIComponent(fechaFin)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(conflicto => {
+                    const botonAceptar = document.getElementById("btnAceptar");
+                    if (conflicto) {
+                        botonAceptar.disabled = true;
+                        alert("Este técnico ya tiene una solicitud en ese horario.");
+                    } else {
+                        botonAceptar.disabled = false;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al verificar conflicto:", error);
+                });
+        }
+    </script>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

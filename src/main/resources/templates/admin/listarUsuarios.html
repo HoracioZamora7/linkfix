@@ -3,75 +3,139 @@
 <head>
     <title>Listado de Usuarios</title>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+       <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        .form-label, label {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .form-control, .form-select {
+            background-color: #f8f9fa;
+            color: #212529;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+        }
+
+        .btn-custom {
+            background-color: #ffffff;
+            color: #0d6efd;
+            border: 1px solid #0d6efd;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-custom:hover {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        .table {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        .table thead {
+            background-color: #343a40;
+        }
+    </style>
 </head>
 <body>
 
-    <h2>Listado de Usuarios</h2>
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
 
-    <div th:if="${error}" th:text="${error}"></div>
+    <div class="container mt-4">
+        <h2 class="mb-4 text-center">Listado de Usuarios</h2>
 
-    <!-- filtro -->
-    <form method="get" th:action="@{/admin/usuarios}">
-        <input type="text" name="usuarioCorreo" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
-        <button type="submit">Búsqueda</button>
-    </form>
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <!-- Tabla de resultados -->
-    <table border="5">
-        <thead>
-            <tr>
+        <!-- Filtro -->
+        <form method="get" th:action="@{/admin/usuarios}" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="usuarioCorreo" class="form-control" placeholder="Buscar por correo" th:value="${usuarioCorreo}">
+                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+            </div>
+        </form>
 
-                <th>Correo</th>
-                <th>Roles</th>
-                <th>Calificación </th>
-                <th>Estado</th>
-                <th>Fecha de registro</th>
-                <th>DNI</th>
-                <th>RUC</th>
-                <th>Nombres</th>
-                <th>Apellidos</th>
-                <th>Dirección</th>
-                <th>Telefono</th>
-                <th>Ubigeo</th>
-                <th>Acción</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="item : ${usuarioPage}">
-                <td th:text="${item.correo}">Correo</td>
-                <td th:text="${item.roles}">Roles</td>
-                <td th:text="${item.calificacion}">Roles</td>
-                <td th:text="${item.estado}">Estado</td>
-                <td th:text="${#dates.format(item.fecha_registro, 'dd-MM-yyyy HH:mm:ss')}">Fecha de registro</td>
-                <td th:text="${item.dni}">DNI</td>
-                <td th:text="${item.ruc} ?: '-' ">RUC</td>
-                <td th:text="${item.nombre}">Nombres</td>
-                <td th:text="${item.apellidos}">Apellidos</td>
-                <td th:text="${item.direccion}">Direccion</td>
-                <td th:text="${item.telefono}">Telefono</td>
-                <td th:text="${item.ubigeo}">Ubigeo</td>
-                <td>
-                    <form th:action="@{/admin/usuarios/editar}" method="post">
-                        <input type="hidden" name="id" th:value="${item.id}"/>
-                        <button type="submit">Editar</button>
-                    </form>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Tabla de resultados -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Correo</th>
+                        <th>Roles</th>
+                        <th>Calificación</th>
+                        <th>Estado</th>
+                        <th>Fecha de registro</th>
+                        <th>DNI</th>
+                        <th>RUC</th>
+                        <th>Nombres</th>
+                        <th>Apellidos</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <th>Ubigeo</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${usuarioPage}">
+                        <td th:text="${item.correo}">Correo</td>
+                        <td th:text="${item.roles}">Roles</td>
+                        <td th:text="${item.calificacion}">Calificación</td>
+                        <td th:text="${item.estado}">Estado</td>
+                        <td th:text="${#dates.format(item.fecha_registro, 'dd-MM-yyyy HH:mm:ss')}">Fecha de registro</td>
+                        <td th:text="${item.dni}">DNI</td>
+                        <td th:text="${item.ruc} ?: '-'">RUC</td>
+                        <td th:text="${item.nombre}">Nombres</td>
+                        <td th:text="${item.apellidos}">Apellidos</td>
+                        <td th:text="${item.direccion}">Dirección</td>
+                        <td th:text="${item.telefono}">Teléfono</td>
+                        <td th:text="${item.ubigeo}">Ubigeo</td>
+                        <td>
+                            <form th:action="@{/admin/usuarios/editar}" method="post">
+                                <input type="hidden" name="id" th:value="${item.id}" />
+                                <button type="submit" class="btn btn-sm btn-warning">Editar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <!-- Paginación -->
-    <div>
-        <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
 
-        <div>
-            <a th:if="${page > 0}" th:href="@{|/admin/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}">Anterior</a>
-            <a th:if="${page + 1 < totalPages}" th:href="@{|/admin/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}">Siguiente</a>
+            <div>
+                <a th:if="${page > 0}" th:href="@{|/admin/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}" class="btn btn-outline-secondary btn-sm">Anterior</a>
+                <a th:if="${page + 1 < totalPages}" th:href="@{|/admin/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}" class="btn btn-outline-secondary btn-sm">Siguiente</a>
+            </div>
+        </div>
+
+        <!-- Volver -->
+        <div class="mt-4 text-center">
+            <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
         </div>
     </div>
 
-    <div class="mt-3 text-center">
-        <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
-    </div>
+    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>
