@@ -33,7 +33,6 @@ create table Usuario
 	fecha_registro DATETIME default now(),
 	emailToken varchar(255),
 	emailTokenFechaExpiracion DATETIME,
-	fechaUltimaEdicion DATETIME,
 	idUsuarioUltimaEdicion bigint,
 	
 	primary key (id)
@@ -113,14 +112,18 @@ create table Servicio
 	id bigint auto_increment,
 	idCliente bigint not null,
 	idTecnico bigint not null,
-	idElectrodomestico bigint not null,
+	idElectrodomestico bigint,
 	fecha_solicitud DATETIME default now(),
 	fecha_visita DATETIME,
 	fecha_finalizacion DATETIME,
+	comentario varchar(500),
+	respuesta varchar(500),
 	idEstado int,
 	calificacion float,	
 	primary key (id)
 );
+ 
+
 
 /*Incidencia*/
 create table Incidencia
@@ -157,9 +160,9 @@ CREATE TABLE IF NOT EXISTS ubigeoDistritos (
   `name` varchar(45) DEFAULT NULL,
   `provinceId` varchar(4) DEFAULT NULL,
   `departmentId` varchar(2) DEFAULT null,
+  
   primary key (id)
 ) ;
-
 
 -- --------------------------------------------------------
 
@@ -1489,7 +1492,7 @@ INSERT INTO `ubigeoDistritos` (`id`, `name`, `provinceId`, `departmentId`) VALUE
 ('140310', 'Salas', '1403', '14'),
 ('140311', 'San José', '1403', '14'),
 ('140312', 'Tucume', '1403', '14'),
-('150101', 'Lima', '1501', '15'),
+('150101', 'Cercado de Lima', '1501', '15'),
 ('150102', 'Ancón', '1501', '15'),
 ('150103', 'Ate', '1501', '15'),
 ('150104', 'Barranco', '1501', '15'),
@@ -2402,7 +2405,7 @@ foreign key (idEstado) references Estado(id);
 insert into rol(nombre) values('Administrador'),('Cliente'),('Técnico');
 
 /*estados usuario*/
-insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente de aprobación'), ('Rechazado'), ('Correo no confirmado');
+insert into estado(nombre) values ('Activo'), ('Inactivo'), ('Pendiente de aprobación'), ('Rechazado'), ('Correo no confirmado'), ('Cancelado'), ('Finalizado'), ('Pendiente de confirmación'), ('Aceptado, pero pendiente de atención');
 
 
 insert into dia(nombre) values ('Lunes'), ('Martes'), ('Miercoles'), ('Jueves'), ('Viernes'), ('Sábado'), ('Domingo');
@@ -2411,61 +2414,127 @@ insert into dia(nombre) values ('Lunes'), ('Martes'), ('Miercoles'), ('Jueves'),
 
 /* tabla auditoria*/
 
-CREATE TABLE AUD_UsuarioHistorial (
-    id bigint AUTO_INCREMENT PRIMARY KEY,
+create table AUDUsuarioHistorial (
+    id bigint auto_increment,
     idUsuario bigint,
     correo varchar(50),
-    idEstado INT,
-    fecha_registro DATETIME,
-    emailToken VARCHAR(255),
-    emailTokenFechaExpiracion DATETIME,
-    fechaUltimaEdicion DATETIME,
-    idUsuarioUltimaEdicion BIGINT,
+    idEstado int,
+    nombreEstado varchar(30),
+    fecha_registro datetime,
+    emailToken varchar(255),
+    emailTokenFechaExpiracion datetime,
     
-    idPersona BIGINT,
-    nombre VARCHAR(50),
-    apellidos VARCHAR(50),
-    dni CHAR(8),
-    ruc VARCHAR(20),
-    idUbigeo VARCHAR(6),
-    telefono VARCHAR(9),
-    direccion VARCHAR(75),
+    idUsuarioUltimaEdicion bigint,
+    correoUsuarioUltimaEdicion varchar(50),
+    
+    idPersona bigint,
+    nombre varchar(50),
+    apellidos varchar(50),
+    dni char(8),
+    ruc varchar(20),
+    idUbigeo varchar(6),
+    telefono varchar(9),
+    direccion varchar(75),
 
-    fecha_cambio DATETIME DEFAULT NOW()
+    fecha_cambio datetime default now(),
+    
+    primary KEY(id)
 );
+
+/*
+-- trigger para update usuario
 DELIMITER $$
 
-CREATE TRIGGER after_usuario_update
-AFTER UPDATE ON Usuario
-FOR EACH ROW
-BEGIN
-    DECLARE p_nombre VARCHAR(50);
-    DECLARE p_apellidos VARCHAR(50);
-    DECLARE p_dni CHAR(8);
-    DECLARE p_ruc VARCHAR(20);
-    DECLARE p_idUbigeo VARCHAR(6);
-    DECLARE p_telefono VARCHAR(9);
-    DECLARE p_direccion VARCHAR(75);
+create trigger after_usuario_update
+after update on Usuario
+for each row
+begin
+    declare p_nombre varchar(50);
+    declare p_apellidos varchar(50);
+    declare p_dni char(8);
+    declare p_ruc varchar(20);
+    declare p_idUbigeo varchar(6);
+    declare p_telefono varchar(9);
+    declare p_direccion varchar(75);
+   	declare est_nombre varchar(30);	
+    declare um_correo varchar(50);
 
-    -- Obtener datos de Persona relacionada
-    SELECT nombre, apellidos, dni, ruc, idUbigeo, telefono, direccion
-    INTO p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion
-    FROM Persona
-    WHERE id = NEW.idPersona;
+    -- Obtener datos de la Persona asociada
+    select p.nombre, p.apellidos, p.dni, p.ruc, p.idUbigeo, p.telefono, p.direccion, e.nombre, um.correo
+    into p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion, est_nombre, um_correo
+    from Persona p
+    left join estado e on e.id=new.idEstado
+    left join usuario um on um.id=new.idUsuarioUltimaEdicion
+    where p.id = new.idPersona;
 
-    -- Insertar en historial
-    INSERT INTO AUD_UsuarioHistorial (
-        idUsuario, correo, idEstado, fecha_registro, emailToken, emailTokenFechaExpiracion,
-        fechaUltimaEdicion, idUsuarioUltimaEdicion,
+    -- Insertar en el historial
+    insert into AUDUsuarioHistorial (
+        idUsuario, correo, idEstado, nombreEstado, fecha_registro, emailToken, emailTokenFechaExpiracion, idUsuarioUltimaEdicion, correoUsuarioUltimaEdicion,
         idPersona, nombre, apellidos, dni, ruc, idUbigeo, telefono, direccion,
         fecha_cambio
     )
-    VALUES (
-        NEW.id, NEW.correo, NEW.idEstado, NEW.fecha_registro, NEW.emailToken, 
-        NEW.emailTokenFechaExpiracion, NEW.fechaUltimaEdicion, NEW.idUsuarioUltimaEdicion,
-        NEW.idPersona, p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion,
-        NOW()
+    values (
+        new.id, new.correo, new.idEstado, est_nombre, new.fecha_registro, new.emailToken, 
+        new.emailTokenFechaExpiracion, new.idUsuarioUltimaEdicion, um_correo,
+        new.idPersona, p_nombre, p_apellidos, p_dni, p_ruc, p_idUbigeo, p_telefono, p_direccion,
+        now()
     );
+END$$
+
+DELIMITER ;
+*/
+-- trigger para registro usuario (no es necesario implementar, pues al registrarse por primera vez se lanza un update que le genera un email Token) -> se podría mejorar haciendo que consuma un sp
+
+
+-- storedp procedure para listado de tecnicos (al final no lo utilizo)
+
+
+DELIMITER $$
+
+create procedure listarTecnicosDisponibles(
+    in p_idUbigeo varchar(6),
+    in p_idElectrodomestico bigint,
+    in p_idDia int,
+    in p_horaInicio time,
+    in p_horaFin time,
+    in p_page int,
+    in p_pageSize int
+)
+begin
+    declare v_offset int;
+
+    set v_offset = (p_page - 1) * p_pageSize;
+
+    select distinct 
+        u.id,
+        concat(p.apellidos, ', ', p.nombre) as nombreCompleto,
+        u.correo,
+        u.calificacion,
+        d.nombre as nombreDia,
+        disp.horaInicio,
+        disp.horaFin,
+        e.nombre as nombreElectrodomestico,
+        e.id as idElectrodomestico
+    from usuario u
+    join persona p on u.idPersona = p.id
+    left join especialidad esp on esp.idTecnico = u.id
+    left join electrodomestico e on esp.idElectrodomestico = e.id
+    left join disponibilidad disp on disp.idTecnico = u.id
+    left join dia d on d.id = disp.idDia
+    where u.idEstado = 1
+      and substring(p.idUbigeo, 1, 4) = substring(p_idUbigeo, 1, 4)
+      and (p_idDia is null or disp.idDia = p_idDia)
+      and (p_horaInicio is null or disp.horaInicio <= p_horaInicio)
+      and (p_horaFin is null or disp.horaFin >= p_horaFin)
+      and (p_idElectrodomestico is null or e.id = p_idElectrodomestico)
+    order by  
+        case 
+            when p_idElectrodomestico is null then 0 
+            when e.id = p_idElectrodomestico then 0 
+            else 1 
+        end,
+        u.calificacion desc 
+    limit p_pageSize offset v_offset;
 END$$
 
 DELIMITER ;
