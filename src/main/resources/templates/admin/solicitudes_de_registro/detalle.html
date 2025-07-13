@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle de Solicitud</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-control, .form-check-input {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: 1px solid #444;
+        }
+
+        .form-control:focus, .form-check-input:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+
+        h2 {
+            color: #0d6efd;
+        }
+
+        .btn-link {
+            color: #ffffff;
+        }
+
+        .btn-link:hover {
+            color: #0d6efd;
+            text-decoration: underline;
+        }
+
+        .navbar {
+            margin-bottom: 2rem;
+        }
+    </style>
+
+    <script>
+        function toggleCheckbox(clickedId) {
+            const ids = ['aprobar', 'rechazar'];
+            ids.forEach(id => {
+                if (id !== clickedId) document.getElementById(id).checked = false;
+            });
+        }
+    </script>
+</head>
+<body>
+
+<!-- NAVBAR -->
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-body text-white">
+            <h2 class="card-title text-center mb-4">Detalle de Solicitud</h2>
+
+            <div class="mb-4">
+                <div class="mb-2"><strong>ID:</strong> <span th:text="${solicitud.id}">1</span></div>
+                <div class="mb-2"><strong>Correo:</strong> <span th:text="${solicitud.tecnico.correo}">correo@ejemplo.com</span></div>
+                <div class="mb-2">
+                    <strong>Nombre:</strong>
+                    <span th:text="${solicitud.tecnico.persona.nombre + ' ' + solicitud.tecnico.persona.apellidos}">Nombre Apellido</span>
+                </div>
+                <div class="mb-2"><strong>DNI:</strong> <span th:text="${solicitud.tecnico.persona.dni}">00000000</span></div>
+                <div class="mb-2"><strong>Teléfono:</strong> <span th:text="${solicitud.tecnico.persona.telefono}">999999999</span></div>
+                <div class="mb-2"><strong>Fecha de Registro:</strong> <span th:text="${solicitud.fecha_registro}">2025-05-24</span></div>
+                <div class="mb-2"><strong>Estado Usuario:</strong> <span th:text="${solicitud.tecnico.estado.nombre}">Activo</span></div>
+            </div>
+
+            <form th:action="@{'/solicitudes/editar/' + ${solicitud.id}}" method="post">
+                <div class="mb-3">
+                    <label for="comentario" class="form-label">Comentario del administrador:</label>
+                    <textarea id="comentario" name="comentario" class="form-control"
+                              th:text="${solicitud.comentario}"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label d-block">Acción:</label>
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" id="aprobar" name="aprobar" value="true"
+                               class="form-check-input" onchange="toggleCheckbox('aprobar')">
+                        <label class="form-check-label" for="aprobar">Aprobar</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input type="checkbox" id="rechazar" name="rechazar" value="true"
+                               class="form-check-input" onchange="toggleCheckbox('rechazar')">
+                        <label class="form-check-label" for="rechazar">Rechazar</label>
+                    </div>
+                </div>
+
+                <div class="mb-3 text-center">
+                    <button type="submit" class="btn btn-primary px-4">Guardar</button>
+                </div>
+            </form>
+
+            <div class="text-center">
+                <a th:href="@{/solicitudes/lista}" class="btn btn-link">← Volver</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

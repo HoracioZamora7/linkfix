@@ -1,0 +1,37 @@
+<!-- fragments/header.html -->
+<div th:fragment="navbar">
+    <header style="background-color: #f8f9fa; border-bottom: 1px solid #ccc; padding: 10px 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+            <!-- Logo -->
+            <a th:href="@{/home}" style="text-decoration: none; color: black; display: flex; align-items: center; gap: 10px;">
+                <img src="https://cdn-icons-png.flaticon.com/512/807/807303.png" alt="Logo" style="height: 40px;">
+                <nav style="font-size: 1.5rem; font-weight: bold;">LinkFix</nav>
+            </a>
+
+            <!-- Botones principales -->
+            <div style="display: flex; gap: 10px;">
+                <!-- Boton para técnicos-->
+                <a th:if="${session.logueado.roles.contains(3)}" th:href="@{/servicio/historialPeticiones}" class="btn btn-outline-dark">Peticiones de reparación</a>
+                <!-- Botones para clientes-->
+                <nav th:if="${session.logueado.roles.contains(2)}">
+                    <a th:href="@{/servicio/historialSolicitudes}" class="btn btn-outline-dark">Mis solicitudes</a>
+                    <a th:href="@{/servicio/buscar}" class="btn btn-outline-primary">Solicitar una reparación</a>
+                </nav>
+                <!-- Boton para admin-->
+                <a th:if="${session.logueado.roles.contains(1)}" th:href="@{/panelAdmin}" class="btn btn-outline-warning">Página de administrador</a>
+            </div>
+
+            
+            <!-- Perfil y cerrar sesión -->
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a th:href="@{/perfil}" class="btn btn-outline-secondary">Perfil &#128100;</a>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn btn-outline-danger">
+                        Cerrar sesión
+                    </button>
+                </form>
+                
+            </div>
+        </div>
+    </header>
+</div>

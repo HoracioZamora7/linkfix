@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Historial de Usuarios</title>
+    <meta charset="UTF-8" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>Historial de Usuarios</h2>
+
+        <!-- Mensaje de error -->
+        <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+        <!-- Filtro de búsqueda -->
+        <form method="get" th:action="@{/historial/usuarios}" class="mb-3">
+            <div class="input-group">
+                <input type="text" name="usuarioCorreo" class="form-control" placeholder="Buscar registros por correo de usuario" th:value="${usuarioCorreo}">
+                <button type="submit" class="btn btn-outline-primary">Buscar</button>
+            </div>
+        </form>
+
+        <!-- Tabla de resultados -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Correo</th>
+                        <th>Nombre</th>
+                        <th>Apellidos</th>
+                        <th>DNI</th>
+                        <th>RUC</th>
+                        <th>Ubigeo</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Roles</th>
+                        <th>Estado</th>
+                        <th>Fecha de registro</th>
+                        <th>Fecha de cambio</th>
+                        <th>Usuario que realizó el cambio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="item : ${historialPage}">
+                        <td th:text="${item.idUsuario}">ID</td>
+                        <td th:text="${item.correo}">Correo</td>
+                        <td th:text="${item.nombre}">Nombre</td>
+                        <td th:text="${item.apellidos}">Apellidos</td>
+                        <td th:text="${item.dni}">DNI</td>
+                        <td th:text="${item.ruc} ?: '-'">RUC</td>
+                        <td th:text="${item.idUbigeo}">Ubigeo</td>
+                        <td th:text="${item.telefono}">Teléfono</td>
+                        <td th:text="${item.direccion}">Dirección</td>
+                        <td th:text="${item.roles}">Roles</td>
+                        <td th:text="${item.nombreEstado}">Estado</td>
+                        <td th:text="${#temporals.format(item.fechaRegistro, 'dd/MM/yyyy HH:mm')}">Fecha registro</td>
+                        <td th:text="${#temporals.format(item.fechaCambio, 'dd/MM/yyyy HH:mm')}">Fecha cambio</td>
+                        <td th:text="${item.correoUsuarioUltimaEdicion}">Usuario que hizo el cambio</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center">
+            <span th:text="'Página ' + (${page} + 1) + ' de ' + ${totalPages}"></span>
+            <div>
+                <a th:if="${page > 0}" th:href="@{|/historial/usuarios?page=${page - 1}&usuarioCorreo=${usuarioCorreo}|}" class="btn btn-outline-secondary btn-sm">Anterior</a>
+                <a th:if="${page + 1 < totalPages}" th:href="@{|/historial/usuarios?page=${page + 1}&usuarioCorreo=${usuarioCorreo}|}" class="btn btn-outline-secondary btn-sm">Siguiente</a>
+            </div>
+        </div>
+
+        <!-- Botón de volver -->
+        <div class="mt-4 text-center">
+            <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
+        </div>
+    </div>
+
+</body>
+</html>

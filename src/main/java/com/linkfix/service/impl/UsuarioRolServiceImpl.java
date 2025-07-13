@@ -31,4 +31,10 @@ public class UsuarioRolServiceImpl implements UsuarioRolService {
         
         return repository.findRolesByUsuario(u);
     }
+
+    @Override
+    public List<RolEntity> findRolesbyIdUsuario(Long idUsuario) {
+        return repository.findRolesByIdUsuario(idUsuario);
+    }
+    
 }

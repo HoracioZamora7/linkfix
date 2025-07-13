@@ -1,20 +1,7 @@
 package com.linkfix.mapper;
 
-import com.linkfix.dto.UsuarioDTO;
-import com.linkfix.entity.UsuarioEntity;
-import com.linkfix.service.DepartamentoService;
-import com.linkfix.service.ProvinciaService;
-import com.linkfix.entity.DepartamentoEntity;
-import com.linkfix.entity.ProvinciaEntity;
-import com.linkfix.entity.RolEntity;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 public class UsuarioMapper {
-/* 
+/*  esto se paso al service de usuario como metodo publico
     @Autowired
     private DepartamentoService departamentoService;
 

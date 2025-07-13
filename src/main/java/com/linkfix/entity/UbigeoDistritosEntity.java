@@ -32,4 +32,8 @@ public class UbigeoDistritosEntity implements Serializable{
 
     @Column(name = "departmentId")
     private String departmentId;
+
+/*     //una pena que no esté normalizado, sino nos evitariamos esto
+    @Transient
+    private String distritoNombre; */
 }

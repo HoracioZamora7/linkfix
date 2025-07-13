@@ -6,5 +6,6 @@ import com.linkfix.entity.ElectrodomesticoEntity;
 public interface ElectrodomesticoService {
 
     List<ElectrodomesticoEntity> findAll();
+    ElectrodomesticoEntity findById(Long id);
 
 }

@@ -1,79 +1,160 @@
-<!-- src/main/resources/templates/usuario/perfil.html -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
 <head>
-    <title>Mi Perfil</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/estilos.css}">
-    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <title>Mi Perfil</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap-icons.css}">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .list-group-item {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            border: none;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #2c2c2c;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #444;
+            color: #ffffff;
+        }
+
+        table thead {
+            background-color: #343a40;
+        }
+
+        .btn-custom {
+            background-color: #ffffff;
+            color: #0d6efd;
+            border: 1px solid #0d6efd;
+            transition: all 0.3s ease-in-out;
+            margin-bottom: 10px;
+        }
+
+        .btn-custom:hover {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        h2 {
+            color: #0d6efd;
+        }
+
+        .info-label {
+            color: #999;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        hr {
+            border-top: 1px solid #444;
+        }
+
+        a.btn-custom i {
+            margin-right: 5px;
+        }
+    </style>
 </head>
-<body>
-    <div class="container mt-5">
-        <h2 class="mb-4 text-center">perfil</h2>
+<body class="bg-dark text-white">
 
-        <div class="card">
-            <div class="card-body">
-                <p>Nombre: <span th:text="${usuarioDTO.nombre}"></span></p>
-                <p>Apellidos: <span th:text="${usuarioDTO.apellidos}"></span></p>
-                <p>DNI: <span th:text="${usuarioDTO.dni}"></span></p>
-                <p>Correo: <span th:text="${usuarioDTO.correo}"></span></p>
-                <p>Teléfono: <span th:text="${usuarioDTO.telefono}"></span></p>
-                <p>Dirección: <span th:text="${usuarioDTO.direccion}"></span></p>
-                <p>Ubigeo: <span th:text="${usuarioDTO.ubigeo}"></span></p>
-                <p>Departamento: <span th:text="${usuarioDTO.departamento}"></span></p>
-                <p>Provincia: <span th:text="${usuarioDTO.provincia}"></span></p>
-                <p>Distrito: <span th:text="${usuarioDTO.distrito}"></span></p>
-                <p>Fecha de Registro: <span th:text="${#temporals.format(usuarioDTO.fecha_registro, 'yyyy-MM-dd HH:mm')}"></span></p>
-                
-                <p class="mb-2"><strong>Roles:</strong></p>
-                    <ul class="list-group mb-3">
-                        <li class="list-group-item" th:each="rolNombre : ${session.logueado.nombresRoles}" th:text="${rolNombre}">Rol</li>
-                    </ul>
-<hr>
-                <!-- solo visible para usuarios de rol técnico -->
-                <div th:if="${session.logueado.roles.contains(3)}">
-                    <p th:if="${usuarioDTO.calificacion==0}">Realiza más servicios para aumentar la calificación! (texto provisional)</p>
-                    <p>Calificación: <span th:text="${usuarioDTO.calificacion}"></span></p>
+<nav th:if="${session.logueado != null}">
+    <div th:replace="~{fragments/header :: navbar}"></div>
+</nav>
 
-                    <!-- esto se puede hacer desplegable -->
-                    <div th:if="${disponibilidad != null and !#lists.isEmpty(disponibilidad)}">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Día</th>
-                                    <th>Hora inicio</th>
-                                    <th>Hora fin</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="horario : ${disponibilidad}">
-                                    <td th:text="${horario.dia.nombre}"></td>
-                                    <td th:text="${horario.horaInicio}"></td>
-                                    <td th:text="${horario.horaFin}"></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div>
-                        <a th:if="${disponibilidad == null or #lists.isEmpty(disponibilidad)}" th:href="@{/perfil/disponibilidad}" class="btn btn-primary">Parece que aún no defines tu disponibilidad horaria. Hazlo ahora!</a>
-                        <a th:href="@{/perfil/disponibilidad}" class="btn btn-primary">Registrar horario</a>
-                    </div>
-                    
+<div class="container mt-4">
+    <h2 class="mb-4 text-center"><i class="bi bi-person-circle"></i> Perfil</h2>
 
+    <div class="card p-4">
+        <div class="card-body">
+            <p><span class="info-label">Nombre:</span> <span class="text-white" th:text="${usuarioDTO.nombre}"></span></p>
+            <p><span class="info-label">Apellidos:</span> <span class="text-white" th:text="${usuarioDTO.apellidos}"></span></p>
+            <p><span class="info-label">DNI:</span> <span class="text-white" th:text="${usuarioDTO.dni}"></span></p>
+            <p><span class="info-label">Correo:</span> <span class="text-white" th:text="${usuarioDTO.correo}"></span></p>
+            <p><span class="info-label">Teléfono:</span> <span class="text-white" th:text="${usuarioDTO.telefono}"></span></p>
+            <p><span class="info-label">Dirección:</span> <span class="text-white" th:text="${usuarioDTO.direccion}"></span></p>
+            <p><span class="info-label">Ubigeo:</span> <span class="text-white" th:text="${usuarioDTO.ubigeo}"></span></p>
+            <p><span class="info-label">Departamento:</span> <span class="text-white" th:text="${usuarioDTO.departamento}"></span></p>
+            <p><span class="info-label">Provincia:</span> <span class="text-white" th:text="${usuarioDTO.provincia}"></span></p>
+            <p><span class="info-label">Distrito:</span> <span class="text-white" th:text="${usuarioDTO.distrito}"></span></p>
+            <p><span class="info-label">Fecha de Registro:</span>
+                <span th:text="${#temporals.format(usuarioDTO.fecha_registro, 'yyyy-MM-dd HH:mm')}"></span></p>
+
+            <p class="mb-2 info-label"><i class="bi bi-shield-lock"></i> Roles:</p>
+            <ul class="list-group mb-3">
+                <li class="list-group-item" th:each="rolNombre : ${session.logueado.nombresRoles}" th:text="${rolNombre}">Rol</li>
+            </ul>
+
+            <hr>
+
+            <!-- Solo para técnicos -->
+            <div th:if="${session.logueado.roles.contains(3)}">
+                <p th:if="${usuarioDTO.calificacion==0}">
+                    Realiza más servicios para aumentar la calificación! (texto provisional)
+                </p>
+                <p><span class="info-label">Calificación:</span> <span th:text="${usuarioDTO.calificacion}"></span></p>
+
+                <!-- Disponibilidad -->
+                <div th:if="${disponibilidad != null and !#lists.isEmpty(disponibilidad)}">
+                    <table class="table table-dark table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th>Día</th>
+                            <th>Hora inicio</th>
+                            <th>Hora fin</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="horario : ${disponibilidad}">
+                            <td th:text="${horario.dia.nombre}"></td>
+                            <td th:text="${horario.horaInicio}"></td>
+                            <td th:text="${horario.horaFin}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
+                <div>
+                    <a th:if="${disponibilidad == null or #lists.isEmpty(disponibilidad)}"
+                       th:href="@{/perfil/disponibilidad}"
+                       class="btn btn-custom w-100"><i class="bi bi-calendar-plus"></i> Definir disponibilidad</a>
+                    <a th:href="@{/perfil/disponibilidad}" class="btn btn-custom w-100"><i class="bi bi-pencil-square"></i> Registrar horario</a>
+                </div>
             </div>
-        </div>
-<hr>
-        <div class="mt-3 text-center">
-            <a th:href="@{/home}" class="btn btn-primary">Volver al inicio</a>
-        </div>
-
-        <div class="mt-3 text-center">
-            <a th:href="@{/perfil/editar}" class="btn btn-primary">Editar perfil</a>
         </div>
     </div>
 
-    <script th:src="@{/webjars/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <hr>
+
+    <div class="text-center mt-3">
+        <a th:href="@{/home}" class="btn btn-custom"><i class="bi bi-house-door-fill"></i> Volver al inicio</a>
+        <a th:href="@{/perfil/editar}" class="btn btn-custom"><i class="bi bi-gear-fill"></i> Editar perfil</a>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

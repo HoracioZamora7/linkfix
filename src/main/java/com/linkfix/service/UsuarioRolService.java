@@ -12,4 +12,5 @@ public interface UsuarioRolService {
 
     List<UsuarioRolEntity> findAll();
     List<RolEntity> findRolesByUsuario(UsuarioEntity u);
+    List<RolEntity> findRolesbyIdUsuario(Long idUsuario);
 }

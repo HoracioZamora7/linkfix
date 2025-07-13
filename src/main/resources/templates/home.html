@@ -7,7 +7,6 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
           crossorigin="anonymous">
 
-    <!-- Estilos personalizados -->
     <style>
         .btn-outline-success-custom {
             color: #198754;
@@ -32,6 +31,11 @@
     </style>
 </head>
 <body class="bg-dark text-white">
+    
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+    
 
     <div class="d-flex justify-content-center align-items-center min-vh-100 px-2">
         <div class="card shadow-sm w-100" style="max-width: 500px;">
@@ -40,37 +44,60 @@
                 <h1 class="card-title text-center text-primary mb-4">Bienvenido al sistema</h1>
 
                 <!-- div para usuarios logueados -->
+                <div th:if="${error}" class="alert alert-danger text-center mb-0" th:text="${error}"></div>
+                <div th:if="${mensaje}" class="alert alert-success text-center mb-0" th:text="${mensaje}"></div>
+
                 <div th:if="${session.logueado != null}">
+                    
+                   
 
                     <p class="mb-1">
                         <strong>Usuario:</strong>
                         <span class="text-dark" th:text="${session.logueado.correo}">correo@ejemplo.com</span>
                     </p>
-
+                    <!--
                     <p class="mb-2"><strong>Roles:</strong></p>
                     <ul class="list-group mb-3">
                         <li class="list-group-item" th:each="rol : ${session.logueado.nombresRoles}" th:text="${rol}">Rol</li>
-                    </ul>
+                    </ul>-->
+                    
+                    <hr>
+                    <br>
 
-                    <a  class="btn btn-primary" th:href="@{/perfil}">Visitar perfil</a>
-                    <a th:href="@{/servicio/buscar}" class="btn btn-primary">Buscar Técnicos</a>
+                    <div class="d-grid gap-2 mb-3">
+                        <a class="btn btn-primary" th:href="@{/perfil}">Visitar perfil</a>
+                        <a class="btn btn-primary" th:href="@{/servicio/buscar}">Buscar Técnicos</a>
 
-                    <!-- Botón solo si tiene rol de administrador -->
-                    <a th:if="${session.logueado.roles.contains(1)}"
-                       th:href="@{/solicitudes/lista}"
-                       class="btn btn-outline-success-custom mb-3 d-block">
-                        Validar Técnicos
-                    </a>
+                        <!-- Botón solo si tiene rol de administrador -->
+                        <a th:if="${session.logueado.roles.contains(1)}"
+                        th:href="@{/solicitudes/lista}"
+                        class="btn btn-outline-success-custom">
+                            Validar Técnicos
+                        </a>
 
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit" class="btn btn-outline-danger btn-outline-danger-smooth w-100">
-                            Cerrar sesión
-                        </button>
-                    </form>
+                        <a th:if="${session.logueado.roles.contains(1)}"
+                        th:href="@{/historial/usuarios}"
+                        class="btn btn-outline-success-custom">
+                            Historial cambios
+                        </a>
+
+                        <a th:if="${session.logueado.roles.contains(1)}"
+                        th:href="@{/admin/usuarios}"
+                        class="btn btn-outline-success-custom">
+                            Listado de usuarios
+                        </a>
+
+                        <form th:action="@{/logout}" method="post" class="mt-2">
+                            <button type="submit" class="btn btn-outline-danger btn-outline-danger-smooth w-100">
+                                Cerrar sesión
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
+
                 <!-- div por si no hay sesión válida -->
-                <div th:if="${session.logueado == null and session.mostrarMensajeInvalido == true}">
+                <div th:if="${session.logueado == null }">
                     <div class="alert alert-warning text-center">Sesión no válida</div>
                     <div class="text-center">
                         <a th:href="@{/login}" class="btn btn-primary">Iniciar sesión</a>
