@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${titulo}">Notificación (esto se lee siquiera?)</title>
+</head>
+<body>
+    <h2 th:text="${titulo}"></h2>
+    <p th:text="${mensaje}"></p>
+
+    <div th:if="${enlaceDetalle != null}">
+        <a th:href="${enlaceDetalle}">Revisar detalles del servicio</a>
+    </div>
+</body>
+</html>

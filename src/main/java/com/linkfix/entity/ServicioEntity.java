@@ -47,9 +47,13 @@ public class ServicioEntity {
     private EstadoEntity estado;
 
     @Column(name = "calificacion")
-    private float calificacion;
+    private Float calificacion;
 
     @Column(name="comentario")
     private String comentario;
+
+    @Column(name="respuesta")
+    private String respuesta;
+
 
 }

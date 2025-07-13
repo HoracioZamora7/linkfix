@@ -3,17 +3,16 @@ package com.linkfix.controller;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import com.linkfix.controller.admin.AdminUsuarioController;
 import com.linkfix.dto.DisponibilidadDTO;
 import com.linkfix.dto.TecnicoListadoDTO;
@@ -40,7 +38,6 @@ import jakarta.servlet.http.HttpSession;
 @RequestMapping("/servicio")
 @Controller
 public class ServicioController {
-
 
     @Autowired
     private ElectrodomesticoService electrodomesticoService;
@@ -111,13 +108,10 @@ public class ServicioController {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminUsuarioController.class);
 
-
     @PostMapping("/solicitar")
     public String mostrarFormularioSolicitud(HttpSession session, Model model, RedirectAttributes redirectAttributes, @RequestParam Long idTecnico, @RequestParam(required = false) Long idElectrodomestico){
 
-
-        logger.info("/////////////////////////////////////////////////Hola, idTenico es: " + idTecnico.toString());
-
+        //logger.info("/////////////////////////////////////////////////Hola, idTenico es: " + idTecnico.toString());
 
         if(sesionIsValid(session) == false){
             return handleSesionInvalida(redirectAttributes);
@@ -170,7 +164,7 @@ public class ServicioController {
 
 
     @GetMapping("/confirmarSolicitud")
-    public String mostrarDetalleSolicitud(HttpSession session, @RequestParam("servicio") Long servicioID, RedirectAttributes redirectAttributes, Model model){
+    public String mostrarFormConfirmarSolicitud(HttpSession session, @RequestParam("servicio") Long servicioID, RedirectAttributes redirectAttributes, Model model){
         
         if(!sesionIsValid(session)){
             return handleSesionInvalida(redirectAttributes);
@@ -187,24 +181,152 @@ public class ServicioController {
             }
         }
 
-        boolean hayConflicto = servicioService.tieneConflictoDeHorario(servicioEntity.getTecnico().getId(), servicioEntity.getFecha_visita(), servicioEntity.getFecha_finalizacion());
+        if(servicioEntity.getEstado().getId() != 8)
+        {
+            redirectAttributes.addFlashAttribute("error", "Solicitud ya resuelta");
+            return "redirect:/servicio/historialSolicitudes";
+        }
+        //fecha de visita del servicio de reparación mas cercano a la solicitud
+        String fechaLimite = servicioService.findNextServicioHoraVisita(servicioEntity.getId(), servicioEntity.getFecha_visita()).toString();
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        String fechaInicioString = servicioEntity.getFecha_visita() != null ? servicioEntity.getFecha_visita().format(formatter) : "";
-        String fechaFinString = servicioEntity.getFecha_finalizacion() != null ? servicioEntity.getFecha_finalizacion().format(formatter) : "";
-
-        model.addAttribute("fechaInicioString", fechaInicioString);
-        model.addAttribute("fechaFinString", fechaFinString);
-
-        model.addAttribute("hayConflicto", hayConflicto);
+        model.addAttribute("fechaInicioString", servicioEntity.getFecha_visita().toString());
+        model.addAttribute("fechaLimite", fechaLimite); 
         model.addAttribute("servicio", servicioEntity);
 
-        return "/servicio/confirmarSolicitud";
+        return "servicio/confirmarSolicitud";
+    }
+
+
+    @PostMapping("/confirmar")
+    public String confirmarSolicitud(@RequestParam Long idServicio, @RequestParam Integer duracionHoras, RedirectAttributes redirectAttributes, HttpSession session) {
+        
+        ServicioEntity servicioEntity = servicioService.findById(idServicio);
+        LocalDateTime fechaFinal = servicioEntity.getFecha_visita().plusHours(duracionHoras);
+
+        if (duracionHoras == null || duracionHoras < 1 || duracionHoras > 12) {
+            redirectAttributes.addFlashAttribute("error", "La duración ingresada no es válida.");
+            return "redirect:/servicio/confirmarSolicitud?servicio=" + idServicio;
+        }
+        
+        if(!servicioService.aceptarSolicitud(idServicio, fechaFinal)) {
+            redirectAttributes.addFlashAttribute("error", "No se pudo agregar");
+        } else{
+            redirectAttributes.addFlashAttribute("mensaje", "Guardado con éxito");
+        }
+        
+
+        return "redirect:/servicio/historialPeticiones";
     }
 
     
+    @PostMapping("/rechazar")
+    public String rechazarSolicitud(@RequestParam Long idServicio, @RequestParam String motivo, RedirectAttributes redirectAttributes, HttpSession session) {
 
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
+        }
+        
+        boolean exito = servicioService.rechazarSolicitud(idServicio, motivo);
 
+        if (!exito) {
+            redirectAttributes.addFlashAttribute("error", "No se pudo rechazar la solicitud. Contacta con soporte");
+        } else {
+            redirectAttributes.addFlashAttribute("mensaje", "Solicitud rechazada correctamente.");
+        }
+
+        return "redirect:/servicio/historialPeticiones";
+    }
+
+    @GetMapping("/historialSolicitudes")
+    public String historialSolicitudes(RedirectAttributes redirectAttributes, HttpSession session, Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "7,8,9") List<Integer> estados) {
+
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes); 
+        }
+
+        int pageSize= 15;
+
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("fecha_visita").descending());
+
+        Page<ServicioEntity> solicitudes = servicioService.findAllSolicitudesUsuario(usuarioDTO.getId(), estados, pageable);
+
+        model.addAttribute("solicitudes", solicitudes);
+        model.addAttribute("estadosSeleccionados", estados);
+
+        return "servicio/historial/solicitudes";
+    }
+
+    @GetMapping("/historialPeticiones")
+    public String historialPeticiones(RedirectAttributes redirectAttributes, HttpSession session, Model model, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "7,8,9") List<Integer> estados) {
+
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes); 
+        }
+
+        int pageSize = 15;
+
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("fecha_visita").descending());
+
+        Page<ServicioEntity> peticiones = servicioService.findAllPeticionesTecnico(usuarioDTO.getId(), estados, pageable);
+
+        model.addAttribute("peticiones", peticiones);
+        model.addAttribute("estadosSeleccionados", estados);
+
+        return "servicio/historial/peticiones";
+    }
+
+    @GetMapping("/detalle")
+    public String mostrarDetalleSolicitud(RedirectAttributes redirectAttributes, HttpSession session, Model model, @RequestParam("id") Long servicioID) {
+
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes); 
+        } 
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+
+        ServicioEntity servicioEntity = servicioService.findById(servicioID);
+
+        Long userID = usuarioDTO.getId();
+
+        if(userID != servicioEntity.getTecnico().getId() && userID != servicioEntity.getUsuario().getId()){
+            if(!isAdmin(session)) //y si no es admin
+            {
+                return handleErrorToIndex(redirectAttributes, "Unathorized!");
+            }
+        }
+
+        model.addAttribute("servicio", servicioEntity);
+
+        return "servicio/detalle";
+    }
+
+    @PostMapping("/solicitudes/calificar")
+    public String calificarServicio(@RequestParam("solicitudId") Long idServicio, @RequestParam("calificacion") Integer calificacion, RedirectAttributes redirectAttributes, HttpSession session) {
+
+        System.out.println(">>> MÉTODO CALIFICAR INICIADO");
+        if (!sesionIsValid(session)) {
+            return handleSesionInvalida(redirectAttributes);
+        }
+
+        try {
+            if (calificacion < 1 || calificacion > 5) {
+                redirectAttributes.addFlashAttribute("error", "Calificación inválida.");
+                return "redirect:/servicio/historialSolicitudes";
+            }
+
+            // Aplicar tu lógica personalizada aquí
+            servicioService.calificarSolicitud(idServicio, calificacion);
+            logger.info("Desde controller: "+ calificacion.toString());
+
+            redirectAttributes.addFlashAttribute("mensaje", "Servicio calificado exitosamente.");
+            return "redirect:/servicio/historialSolicitudes";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error al calificar: " + e.getMessage());
+            logger.error("Error al calificar", e);
+            return "redirect:/home";
+        }
+    }
 
 
 
@@ -237,5 +359,8 @@ public class ServicioController {
         logger.info(disponibilidad.toString());
         return disponibilidad;
     }
+
+
+
 
 }

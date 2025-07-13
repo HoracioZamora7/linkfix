@@ -5,6 +5,22 @@
     <title>Confirmar Solicitud</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 </head>
+<style>
+    .form-disabled {
+        pointer-events: none; 
+        opacity: 0.5; 
+    }
+    #formularioRechazo {
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+    }
+
+    #formularioRechazo.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+</style>
 <body>
         <nav th:if="${session.logueado != null}">
         <div th:replace="~{fragments/header :: navbar}"></div>
@@ -15,67 +31,155 @@
         <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
         <div th:if="${mensaje}" class="alert alert-success" th:text="${mensaje}"></div>
 
-        <form th:action="@{/servicio/confirmar}" method="post">
-            <input type="hidden" name="idServicio" th:value="${servicio.id}" />
-            <input type="hidden" id="idTecnico" th:value="${servicio.tecnico.id}" />
+        
+        <div id= "formularioConfirmar">
+            <form th:action="@{/servicio/confirmar}" method="post">
+                <input type="hidden" name="idServicio" th:value="${servicio.id}" />
+                <input type="hidden" id="idTecnico" th:value="${servicio.tecnico.id}" />
 
-            <!-- Cliente -->
-            <div class="mb-3">
-                <label class="form-label">Cliente:</label>
-                <p th:text="${servicio.usuario.persona.nombre} + ' ' + ${servicio.usuario.persona.apellidos}"></p>
-            </div>
+                <!-- Cliente -->
+                <div class="mb-3">
+                    <label class="form-label">Cliente:</label>
+                    <p th:text="${servicio.usuario.persona.nombre} + ' ' + ${servicio.usuario.persona.apellidos}"></p>
+                </div>
 
-            <!-- Fecha y Hora  (se valida mediante llamadas a la api (revisar script abajo)) -->
-            <div class="mb-3">
-                <label for="fechaInicio" class="form-label">Fecha y hora de visita</label>
-                <input type="datetime-local" id="fechaInicio" name="fechaInicio"
-                       class="form-control" th:value="${fechaInicioString}" onchange="verificarConflicto()" required>
-            </div>
+                <!-- Fecha y Hora  (se valida mediante llamadas a la api (revisar script abajo)) onchange="verificarConflicto()"-->
+                <div class="mb-3">
+                    <label for="fechaInicio" class="form-label">Fecha y hora de visita</label>
+                    <input type="datetime-local" id="fechaInicio" name="fechaInicio" class="form-control" th:value="${fechaInicioString}" 
+                            readonly>
+                </div>
 
-            <div class="mb-3">
-                <label for="fechaFin" class="form-label">Fecha y hora de finalización</label>
-                <input type="datetime-local" id="fechaFin" name="fechaFin"
-                       class="form-control" th:value="${fechaFinString}" onchange="verificarConflicto()" required>
-            </div>
+                <!-- Duración estimada en horas -->
+                <div class="mb-3">
+                    <label for="duracionHoras" class="form-label">Duración estimada (horas)</label>
+                    <input type="number" id="duracionHoras" name="duracionHoras"
+                        class="form-control" min="1" max="12" required onchange="verificarLimiteHoras()">
 
-            <!-- Comentario -->
-            <div class="mb-3">
-                <label class="form-label">Comentario:</label>
-                <p th:text="${servicio.comentario}"></p>
-            </div>
+                    <div id="fechaFinalizacion" hidden class="alert alert-info mt-3"></div>
+                    <div id="mensajeErrorFechas" hidden class="alert alert-danger mt-3"></div>
+                </div>
 
-            <!-- Botones -->
-            <div class="text-center">
-                <button type="submit" class="btn btn-success" id="btnAceptar">Aceptar solicitud</button>
-                <a th:href="@{/servicio/rechazar(id=${servicio.id})}" class="btn btn-danger">Rechazar solicitud</a>
-            </div>
-        </form>
+
+
+                <!-- Comentario -->
+                <div class="mb-3">
+                    <label class="form-label">Comentario:</label>
+                    <p th:text="${servicio.comentario}"></p>
+                </div>
+
+                <!-- Botones -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-success" id="btnAceptar" disabled>Aceptar solicitud</button>
+                    <!-- <a th:href="@{/servicio/rechazar(id=${servicio.id})}" class="btn btn-danger">Rechazar solicitud</a> -->
+                    <button type="button" class="btn btn-danger" onclick="mostrarFormularioRechazo()">Rechazar solicitud</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="formularioRechazo" class="mt-4" hidden>
+            <form th:action="@{/servicio/rechazar}" method="post">
+                <input type="hidden" name="idServicio" th:value="${servicio.id}" />
+                <div class="mb-3">
+                    <label for="motivo" class="form-label">Motivo del rechazo:</label>
+                    <textarea id="motivo" name="motivo" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-danger">Confirmar rechazo</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelarRechazo()">Cancelar</button>
+                </div>
+            </form>
+        </div>
     </div>
-
     <script>
-        function verificarConflicto() {
-            const idTecnico = document.getElementById("idTecnico").value;
+        const fechaLimite = /*[[${fechaLimite}]]*/ null;
+
+        function desactivar(mensajeError = "") {
+            const btnAceptar = document.getElementById("btnAceptar")
+            const divMensajeErrorFechas = document.getElementById("mensajeErrorFechas")
+            const divFechaFinalizacion = document.getElementById("fechaFinalizacion")
+
+            btnAceptar.disabled = true;
+
+            if (mensajeError) {
+                divMensajeErrorFechas.innerHTML = mensajeError;
+                divMensajeErrorFechas.hidden = false;
+            } else {
+                divMensajeErrorFechas.hidden = true;
+                divMensajeErrorFechas.innerHTML = "";
+            }
+
+            divFechaFinalizacion.hidden = true;
+            divFechaFinalizacion.innerHTML = "";
+        }
+
+        function verificarLimiteHoras() {
             const fechaInicio = document.getElementById("fechaInicio").value;
-            const fechaFin = document.getElementById("fechaFin").value;
+            const horasTrabajo = parseInt(document.getElementById("duracionHoras").value);
+            const divFechaFinalizacion = document.getElementById("fechaFinalizacion");
+            const btnAceptar = document.getElementById("btnAceptar");
+            const divMensajeErrorFechas = document.getElementById("mensajeErrorFechas");
 
-            if (!fechaInicio || !fechaFin) return;
+            // Validaciones iniciales
+            if (!fechaInicio || isNaN(horasTrabajo)) {
+                desactivar();
+                return;
+            }
 
-            const url = `/api/servicio/verificar-conflicto?idTecnico=${idTecnico}&fechaInicio=${encodeURIComponent(fechaInicio)}&fechaFin=${encodeURIComponent(fechaFin)}`;
+            if (horasTrabajo > 12) {
+                desactivar("Solo puedes definir 12h como máximo");
+                return;
+            }
 
-            fetch(url)
-                .then(response => response.json())
-                .then(conflicto => {
-                    const botonAceptar = document.getElementById("btnAceptar");
-                    if (conflicto) {
-                        botonAceptar.disabled = true;
-                        alert("Este técnico ya tiene una solicitud en ese horario.");
-                    } else {
-                        botonAceptar.disabled = false;
-                    }
-                })
-                .catch(error => {
-                    console.error("Error al verificar conflicto:", error);
-                });
+            // Cálculo de fecha final estimada
+            const inicio = new Date(fechaInicio);
+            const finEstimado = new Date(inicio.getTime() + horasTrabajo * 60 * 60 * 1000);
+
+            divFechaFinalizacion.innerHTML = "Fecha de finalización: " + finEstimado.toString();
+            divFechaFinalizacion.hidden = false;
+
+            // Validación contra fecha límite
+            if (fechaLimite) {
+                const limite = new Date(fechaLimite);
+                if (finEstimado >= limite) {
+                    desactivar("Conflicto Horario");
+                    return;
+                }
+            }
+
+            // Todo OK
+            btnAceptar.disabled = false;
+            divMensajeErrorFechas.hidden = true;
+            divMensajeErrorFechas.innerHTML = "";
+        }
+
+        //mostrar form de rechazo
+        /*function mostrarFormularioRechazo() {
+            document.getElementById("formularioRechazo").hidden = false;
+            document.getElementById("formularioConfirmar").classList.add("form-disabled");
+        }
+
+        function cancelarRechazo() {
+            document.getElementById("formularioRechazo").hidden = true;
+            document.getElementById("formularioConfirmar").classList.remove("form-disabled");
+        }*/
+        function mostrarFormularioRechazo() {
+            const formRechazo = document.getElementById("formularioRechazo");
+            formRechazo.hidden = false;
+            setTimeout(() => formRechazo.classList.add("visible"), 10); // activar animación con delay mínimo
+
+            document.getElementById("formularioConfirmar").classList.add("form-disabled");
+        }
+
+        function cancelarRechazo() {
+            const formRechazo = document.getElementById("formularioRechazo");
+            formRechazo.classList.remove("visible");
+
+            setTimeout(() => {
+                formRechazo.hidden = true;
+            }, 400); // coincide con duración del transition
+
+            document.getElementById("formularioConfirmar").classList.remove("form-disabled");
         }
     </script>
 

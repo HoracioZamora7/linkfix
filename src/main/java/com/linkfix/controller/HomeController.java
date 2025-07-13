@@ -35,6 +35,13 @@ public class HomeController {
     { 
         return "index";
     }
+    
+    @GetMapping("/home")
+    public String mostrarHome(Model model)
+    { 
+        return "home";
+    }
+
 
     @GetMapping("/login")
     public String mostrarLogin(Model model)
@@ -47,4 +54,6 @@ public class HomeController {
         redirectAttributes.addFlashAttribute("mensaje", "Sesión cerrada correctamente");
         return "redirect:/login";
     }
+
+
 }

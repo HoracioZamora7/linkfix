@@ -28,4 +28,6 @@ public interface UsuarioService {
     public boolean actualizarUsuario(UsuarioEntity usuarioEntity, Long idUsuarioUltimaEdicion);
 
     public Page<TecnicoListadoDTO> listarTecnicosDisponibles(String idUbigeo, Long idElectrodomestico, Integer idDia, LocalTime horaInicio, LocalTime horaFIn, Pageable pageable);
+
+    public void recalcularCalificacion(Long idTecnico);
 }

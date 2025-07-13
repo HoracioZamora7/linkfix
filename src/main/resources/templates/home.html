@@ -45,9 +45,11 @@
                 <h1 class="card-title text-center text-primary mb-4">Bienvenido al sistema</h1>
 
                 <!-- div para usuarios logueados -->
+                <div th:if="${error}" class="alert alert-danger text-center mb-0" th:text="${error}"></div>
+                <div th:if="${mensaje}" class="alert alert-success text-center mb-0" th:text="${mensaje}"></div>
 
                 <div th:if="${session.logueado != null}">
-
+                    
                    
 
                     <p class="mb-1">

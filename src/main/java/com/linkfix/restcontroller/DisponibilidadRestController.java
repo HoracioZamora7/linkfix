@@ -68,7 +68,7 @@ public class DisponibilidadRestController {
         return horas;
     }
 
-   @GetMapping("/verificar-conflicto")
+    @GetMapping("/verificar-conflicto")
     public boolean verificarConflicto( @RequestParam Long idTecnico, @RequestParam String fechaInicio, @RequestParam String fechaFin){
         
         try {

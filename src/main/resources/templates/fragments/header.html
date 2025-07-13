@@ -11,10 +11,10 @@
             <!-- Botones principales -->
             <div style="display: flex; gap: 10px;">
                 <!-- Boton para técnicos-->
-                <a th:if="${session.logueado.roles.contains(3)}" th:href="@{/peticiones}" class="btn btn-outline-dark">Peticiones de reparación</a>
+                <a th:if="${session.logueado.roles.contains(3)}" th:href="@{/servicio/historialPeticiones}" class="btn btn-outline-dark">Peticiones de reparación</a>
                 <!-- Botones para clientes-->
                 <nav th:if="${session.logueado.roles.contains(2)}">
-                    <a th:href="@{/solicitudes}" class="btn btn-outline-dark">Mis solicitudes</a>
+                    <a th:href="@{/servicio/historialSolicitudes}" class="btn btn-outline-dark">Mis solicitudes</a>
                     <a th:href="@{/servicio/buscar}" class="btn btn-outline-primary">Solicitar una reparación</a>
                 </nav>
                 <!-- Boton para admin-->
@@ -25,7 +25,12 @@
             <!-- Perfil y cerrar sesión -->
             <div style="display: flex; align-items: center; gap: 10px;">
                 <a th:href="@{/perfil}" class="btn btn-outline-secondary">Perfil &#128100;</a>
-                <a th:href="@{/logout}" class="btn btn-outline-danger">Cerrar sesión</a>
+                <form th:action="@{/logout}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn btn-outline-danger" >
+                        Cerrar sesión
+                    </button>
+                </form>
+                
             </div>
         </div>
     </header>

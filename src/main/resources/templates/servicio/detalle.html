@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del Servicio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+            <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+<div class="container mt-4">
+
+    
+    <h2>Detalle del Servicio</h2>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>Cliente</th>
+            <td th:text="${servicio.usuario.persona.nombre} + ' ' + ${servicio.usuario.persona.apellidos}">---</td>
+        </tr>
+        <tr>
+            <th>Técnico</th>
+            <td th:text="${servicio.tecnico.persona.nombre} + ' ' + ${servicio.tecnico.persona.apellidos}">---</td>
+        </tr>
+        <tr>
+            <th>Fecha de solicitud</th>
+            <td th:text="${#temporals.format(servicio.fecha_solicitud, 'yyyy-MM-dd HH:mm')}">---</td>
+        </tr>
+        <tr>
+            <th>Fecha de visita</th>
+            <td th:text="${#temporals.format(servicio.fecha_visita, 'yyyy-MM-dd HH:mm')}">---</td>
+        </tr>
+        <tr>
+            <th>Fecha estimada de finalización</th>
+            <td th:text="${#temporals.format(servicio.fecha_finalizacion, 'yyyy-MM-dd HH:mm')}">---</td>
+        </tr>
+        <tr>
+            <th>Estado</th>
+            <td th:text="${servicio.estado.nombre}">---</td>
+        </tr>
+        <tr>
+            <th>Dirección</th>
+            <td th:text="${servicio.usuario.persona.direccion}">---</td>
+        </tr>
+        <tr>
+            <th>Distrito</th>
+            <td th:text="${servicio.usuario.persona.ubigeo.name}">---</td>
+        </tr>
+        <tr>
+            <th>Teléfono</th>
+            <td th:text="${servicio.usuario.persona.telefono}">---</td>
+        </tr>
+        <tr>
+            <th>Calificación</th>
+            <td>
+                <span th:if="${servicio.calificacion != null}">
+                    <span th:each="i : ${#numbers.sequence(1, servicio.calificacion)}">★</span>
+                    <span th:each="i : ${#numbers.sequence(servicio.calificacion + 1, 5)}">☆</span>
+                </span>
+                <span th:if="${servicio.calificacion == null}">Pendiente de calificación</span>
+            </td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

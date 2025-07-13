@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -13,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.linkfix.controller.admin.AdminUsuarioController;
 import com.linkfix.dto.ListadoUsuariosDTO;
 import com.linkfix.dto.TecnicoListadoDTO;
 import com.linkfix.dto.UsuarioDTO;
@@ -278,4 +282,19 @@ public class UsuarioServiceImpl implements UsuarioService {
         
         return dto;
     }
+private static final Logger logger = LoggerFactory.getLogger(AdminUsuarioController.class);
+    @Override
+    public void recalcularCalificacion(Long idTecnico) {
+        UsuarioEntity usuarioEntity = repository.findById(idTecnico).orElse(null);
+        Float nuevaCalificación=repository.recalcularCalificacion(idTecnico);
+        
+        usuarioEntity.setCalificacion(nuevaCalificación);
+
+        repository.save(usuarioEntity);
+        logger.info("Desde usuarioService:" + nuevaCalificación.toString());
+        return;
+    }
+
+    
+
 }
