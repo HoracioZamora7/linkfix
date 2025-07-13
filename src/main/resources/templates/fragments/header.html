@@ -18,7 +18,7 @@
                     <a th:href="@{/servicio/buscar}" class="btn btn-outline-primary">Solicitar una reparación</a>
                 </nav>
                 <!-- Boton para admin-->
-                <a th:if="${session.logueado.roles.contains(1)}" th:href="@{/admin/home}" class="btn btn-outline-warning">Panel de administrador</a>
+                <a th:if="${session.logueado.roles.contains(1)}" th:href="@{/panelAdmin}" class="btn btn-outline-warning">Página de administrador</a>
             </div>
 
             
@@ -26,7 +26,7 @@
             <div style="display: flex; align-items: center; gap: 10px;">
                 <a th:href="@{/perfil}" class="btn btn-outline-secondary">Perfil &#128100;</a>
                 <form th:action="@{/logout}" method="post" style="margin: 0;">
-                    <button type="submit" class="btn btn-outline-danger" >
+                    <button type="submit" class="btn btn-outline-danger">
                         Cerrar sesión
                     </button>
                 </form>

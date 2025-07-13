@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Panel de Administrador</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+</head>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+<body>
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1 class="mb-4">Funciones de Administrador</h1>
+        <div th:if="${session.logueado.roles.contains(1)}" class="d-grid gap-3">
+            <a th:href="@{/solicitudes/lista}" class="btn btn-outline-success">
+                Validar Técnicos
+            </a>
+            <a th:href="@{/historial/usuarios}" class="btn btn-outline-primary">
+                Historial de Cambios
+            </a>
+            <a th:href="@{/admin/usuarios}" class="btn btn-outline-warning">
+                Listado de Usuarios
+            </a>
+        </div>
+
+    </div>
+</body>
+</html>

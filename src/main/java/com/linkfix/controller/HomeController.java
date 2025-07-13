@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.linkfix.dto.UsuarioDTO;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.service.DepartamentoService;
 
 import jakarta.servlet.http.HttpSession;
+import static com.linkfix.util.SesionUtils.*;
 
 @Controller
 public class HomeController {
@@ -48,11 +50,22 @@ public class HomeController {
     { 
         return "login";
     }
+
     @PostMapping("/logout")
     public String cerrarSesion(HttpSession session, RedirectAttributes redirectAttributes) {
         session.invalidate();
         redirectAttributes.addFlashAttribute("mensaje", "Sesión cerrada correctamente");
         return "redirect:/login";
+    }
+
+    @GetMapping("/panelAdmin")
+    public String mostrarPanelAdmin(Model model, HttpSession session, RedirectAttributes redirectAttributes)
+    {         
+        if(sesionIsValid(session) == false || isAdmin(session)==false){
+            return handleSesionInvalida(redirectAttributes);
+        }
+
+        return "admin/panelAdmin";
     }
 
 
