@@ -78,14 +78,14 @@
                     <td>
                         <span th:if="${peticion.estado.id == 7} and ${peticion.calificacion != null}">
                             <span th:each="i : ${#numbers.sequence(1, peticion.calificacion)}">★</span>
-                            <span th:each="i : ${#numbers.sequence(peticion.calificacion + 1, 5)}">☆</span>
                         </span>
                         <span th:if="${peticion.estado.id == 7} and ${peticion.calificacion == null}">
-                            Pendiente de calificación
+                            Pendiente de calificación 
                         </span>
                     </td>
                     <td>
-                        <form th:if="${peticion.fecha_visita <= T(java.time.LocalDateTime).now()}"
+                        <a th:if="${peticion.estado.id == 8}" th:href="@{/servicio/confirmarSolicitud(servicio=${peticion.id})}" class="btn btn-primary btn-sm">Aceptar/Rechazar solicitud</a>
+                        <form th:if="${peticion.estado.id == 9}" 
                             th:action="@{/servicio/completar}" method="post">
                             <input type="hidden" name="id" th:value="${peticion.id}" />
                             <button type="submit" class="btn btn-success btn-sm">Completar</button>

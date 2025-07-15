@@ -247,4 +247,21 @@ public class ServicioServiceImpl implements ServicioService{
         return;
     }
 
+    @Override
+    public boolean completarServicio(Long id) {
+        ServicioEntity servicio= servicioRepository.findById(id).orElse(null);
+        servicio.setEstado(estadoService.findById(7));
+        
+        
+        
+        if(servicioRepository.save(servicio) != null)
+        {
+            return true;
+        }
+        
+        return false;
+    }
+
+    
+
 }

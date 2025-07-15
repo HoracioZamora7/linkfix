@@ -37,5 +37,7 @@ public interface ServicioService {
 
     void calificarSolicitud(Long idServicio, Integer calificacion);
 
+    boolean completarServicio(Long id);
+
 
 }

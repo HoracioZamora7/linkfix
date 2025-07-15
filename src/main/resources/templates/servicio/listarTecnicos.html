@@ -81,7 +81,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-2">
+                <div class="col-md-2" hidden>
                     <label for="idDia" class="form-label">Día</label>
                     <select class="form-select" name="idDia" id="idDia">
                         <option value="">-- Todos --</option>
@@ -92,12 +92,12 @@
                     </select>
                 </div>
 
-                <div class="col-md-2" th:if="${idDia != null and idDia != ''}">
+                <div class="col-md-2" th:if="${idDia != null and idDia != ''}" hidden>
                     <label for="formHoraInicio" class="form-label">Desde</label>
                     <input type="time" id="formHoraInicio" name="formHoraInicio" th:value="${formHoraInicio}" class="form-control"/>
                 </div>
 
-                <div class="col-md-2" th:if="${idDia != null and idDia != ''}">
+                <div class="col-md-2" th:if="${idDia != null and idDia != ''}" hidden>
                     <label for="formHoraFin" class="form-label">Hasta</label>
                     <input type="time" id="formHoraFin" name="formHoraFin" th:value="${formHoraFin}" class="form-control"/>
                 </div>

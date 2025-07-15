@@ -361,6 +361,30 @@ public class ServicioController {
     }
 
 
+    @PostMapping("/completar")
+    public String completarSolicitud(@RequestParam("id") Long idServicio, RedirectAttributes redirectAttributes, HttpSession session)
+    {
+        if (!sesionIsValid(session) || !isAdmin(session)) {
+            return handleSesionInvalida(redirectAttributes);
+        }
+        UsuarioDTO usuarioDTO = (UsuarioDTO) session.getAttribute("logueado");
+
+        ;
+        
+        if(usuarioDTO.getId() != servicioService.findById(idServicio).getTecnico().getId())
+        {
+            if(!isAdmin(session)) //y si no es admin
+            {
+                return handleErrorToIndex(redirectAttributes, "Unathorized!");
+            }
+        }
+
+
+        servicioService.completarServicio(idServicio);      
+        
+        redirectAttributes.addFlashAttribute("mensaje", "COmpletado! ");
+        return "redirect:/servicio/historialPeticiones";
+    }
 
 
 }

@@ -122,7 +122,7 @@ CREATE TABLE `disponibilidad` (
   KEY `fk_disponibilidad_dia` (`idDia`),
   CONSTRAINT `fk_disponibilidad_dia` FOREIGN KEY (`idDia`) REFERENCES `dia` (`id`),
   CONSTRAINT `fk_disponibilidad_usuario` FOREIGN KEY (`idTecnico`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -131,7 +131,6 @@ CREATE TABLE `disponibilidad` (
 
 LOCK TABLES `disponibilidad` WRITE;
 /*!40000 ALTER TABLE `disponibilidad` DISABLE KEYS */;
-INSERT INTO `disponibilidad` VALUES (1,1,1,'08:00:00','12:00:00'),(2,2,2,'09:00:00','13:00:00'),(3,3,3,'10:00:00','14:00:00'),(4,4,4,'13:00:00','17:00:00'),(5,5,5,'14:00:00','18:00:00'),(6,6,2,'06:00:00','08:00:00'),(7,6,1,'06:00:00','08:00:00');
 /*!40000 ALTER TABLE `disponibilidad` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -147,7 +146,7 @@ CREATE TABLE `electrodomestico` (
   `nombre` varchar(100) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `nombre` (`nombre`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -156,7 +155,6 @@ CREATE TABLE `electrodomestico` (
 
 LOCK TABLES `electrodomestico` WRITE;
 /*!40000 ALTER TABLE `electrodomestico` DISABLE KEYS */;
-INSERT INTO `electrodomestico` VALUES (3,'Cocina'),(2,'Lavadora'),(5,'Licuadora'),(4,'Microondas'),(1,'Refrigeradora');
 /*!40000 ALTER TABLE `electrodomestico` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -176,7 +174,7 @@ CREATE TABLE `especialidad` (
   KEY `fk_especialidad_electro` (`idElectrodomestico`),
   CONSTRAINT `fk_especialidad_electro` FOREIGN KEY (`idElectrodomestico`) REFERENCES `electrodomestico` (`id`),
   CONSTRAINT `fk_especialidad_usuario` FOREIGN KEY (`idTecnico`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -185,7 +183,6 @@ CREATE TABLE `especialidad` (
 
 LOCK TABLES `especialidad` WRITE;
 /*!40000 ALTER TABLE `especialidad` DISABLE KEYS */;
-INSERT INTO `especialidad` VALUES (1,1,1),(2,2,2),(3,3,3),(4,4,4),(5,5,5);
 /*!40000 ALTER TABLE `especialidad` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -274,7 +271,7 @@ CREATE TABLE `persona` (
   UNIQUE KEY `telefono` (`telefono`),
   KEY `fk_persona_distrito` (`idUbigeo`),
   CONSTRAINT `fk_persona_distrito` FOREIGN KEY (`idUbigeo`) REFERENCES `ubigeodistritos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -283,7 +280,6 @@ CREATE TABLE `persona` (
 
 LOCK TABLES `persona` WRITE;
 /*!40000 ALTER TABLE `persona` DISABLE KEYS */;
-INSERT INTO `persona` VALUES (1,'TECNICO1','apeTec1','12345671','10400000001','150101','900000001','Dir 1'),(2,'TECNICO2','apeTec2','12345672','10400000002','150102','900000002','Dir 2'),(3,'TECNICO3','apeTec3','12345673','10400000003','150103','900000003','Dir 3'),(4,'TECNICO4','apeTec4','12345674','10400000004','150104','900000004','Dir 4'),(5,'TECNICO5','apeTec5','12345675','10400000005','150105','900000005','Dir 5'),(6,'HORACIO HUMBERTO','ZAMORA HUAYAMARES','72837669',NULL,'150101','906509042','Av Las Palmas Condominio Villa Riviera S/N'),(7,'ITALO GUILLERMO','ZAMORA HUAYAMARES','72813813',NULL,'150101','942096211','Av Las Palmas Condominio Villa Riviera S/N');
 /*!40000 ALTER TABLE `persona` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -353,9 +349,9 @@ CREATE TABLE `servicio` (
   `fecha_visita` datetime DEFAULT NULL,
   `fecha_finalizacion` datetime DEFAULT NULL,
   `comentario` varchar(500) DEFAULT NULL,
+  `respuesta` varchar(500) DEFAULT NULL,
   `idEstado` int(11) DEFAULT NULL,
   `calificacion` float DEFAULT NULL,
-  `respuesta` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_servicio_cliente` (`idCliente`),
   KEY `fk_servicio_tecnico` (`idTecnico`),
@@ -365,7 +361,7 @@ CREATE TABLE `servicio` (
   CONSTRAINT `fk_servicio_electro` FOREIGN KEY (`idElectrodomestico`) REFERENCES `electrodomestico` (`id`),
   CONSTRAINT `fk_servicio_estado` FOREIGN KEY (`idEstado`) REFERENCES `estado` (`id`),
   CONSTRAINT `fk_servicio_tecnico` FOREIGN KEY (`idTecnico`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -374,7 +370,6 @@ CREATE TABLE `servicio` (
 
 LOCK TABLES `servicio` WRITE;
 /*!40000 ALTER TABLE `servicio` DISABLE KEYS */;
-INSERT INTO `servicio` VALUES (3,7,6,NULL,'2025-07-10 19:37:07','2025-07-14 06:00:00','2025-07-14 11:00:00','se me rompio la lavadora che',7,5,NULL),(4,7,6,NULL,'2025-07-12 19:15:59','2025-07-21 06:00:00',NULL,'',8,NULL,NULL);
 /*!40000 ALTER TABLE `servicio` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -462,7 +457,7 @@ CREATE TABLE `usuario` (
   CONSTRAINT `fk_usuario_estado` FOREIGN KEY (`idEstado`) REFERENCES `estado` (`id`),
   CONSTRAINT `fk_usuario_persona` FOREIGN KEY (`idPersona`) REFERENCES `persona` (`id`),
   CONSTRAINT `fk_usuario_usuario` FOREIGN KEY (`idUsuarioUltimaEdicion`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -471,7 +466,6 @@ CREATE TABLE `usuario` (
 
 LOCK TABLES `usuario` WRITE;
 /*!40000 ALTER TABLE `usuario` DISABLE KEYS */;
-INSERT INTO `usuario` VALUES (1,1,'tec1@tecnico.com','pass123',5,1,'2025-07-10 15:00:09',NULL,NULL,NULL),(2,2,'tec2@tecnico.com','pass123',4,1,'2025-07-10 15:00:09',NULL,NULL,NULL),(3,3,'tec3@tecnico.com','pass123',3,1,'2025-07-10 15:00:09',NULL,NULL,NULL),(4,4,'tec4@tecnico.com','pass123',2,1,'2025-07-10 15:00:09',NULL,NULL,NULL),(5,5,'tec5@tecnico.com','pass123',1,1,'2025-07-10 15:00:09',NULL,NULL,NULL),(6,6,'horaciozamora77@gmail.com','$2a$10$wnlig0bVv3MwBtghjVcfD.Id2nAXcturnOr6rnufTtwTbS2EpyYcW',5,1,'2025-07-10 15:01:59','69803997-041f-4014-b69f-1283de332cb7','2025-07-10 15:02:59',NULL),(7,7,'italozamora7@gmail.com','$2a$10$IiSS4TLAx6HYtzRU7WFhzOkVUWd9621mxxhFZbYgRcC1rdnjOyVJC',0,1,'2025-07-10 19:35:56','259e80fe-73cd-4f2e-b4be-0b362be3dd67','2025-07-10 19:45:56',NULL);
 /*!40000 ALTER TABLE `usuario` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -491,7 +485,7 @@ CREATE TABLE `usuariorol` (
   KEY `fk_UsuarioRol_rol` (`idRol`),
   CONSTRAINT `fk_UsuarioRol_rol` FOREIGN KEY (`idRol`) REFERENCES `rol` (`id`),
   CONSTRAINT `fk_UsuarioRol_usuario` FOREIGN KEY (`idUsuario`) REFERENCES `usuario` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -500,7 +494,6 @@ CREATE TABLE `usuariorol` (
 
 LOCK TABLES `usuariorol` WRITE;
 /*!40000 ALTER TABLE `usuariorol` DISABLE KEYS */;
-INSERT INTO `usuariorol` VALUES (1,1,3),(2,2,3),(3,3,3),(4,4,3),(5,5,3),(6,6,2),(7,6,1),(8,6,3),(9,7,2);
 /*!40000 ALTER TABLE `usuariorol` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -513,4 +506,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-12 22:18:00
+-- Dump completed on 2025-07-15 17:24:22

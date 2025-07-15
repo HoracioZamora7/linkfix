@@ -18,7 +18,6 @@ import com.linkfix.entity.DisponibilidadEntity;
 import com.linkfix.entity.SolicitudRegistroEntity;
 import com.linkfix.entity.UsuarioEntity;
 import com.linkfix.entity.UsuarioRolEntity;
-import com.linkfix.entity.aud.AUDUsuarioHistorial;
 import com.linkfix.service.DepartamentoService;
 import com.linkfix.service.DiaService;
 import com.linkfix.service.DisponibilidadService;
@@ -27,7 +26,6 @@ import com.linkfix.service.RolService;
 import com.linkfix.service.SolicitudRegistroService;
 import com.linkfix.service.UsuarioRolService;
 import com.linkfix.service.UsuarioService;
-import com.linkfix.service.aud.AUDUsuarioHistorialService;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.client.RestTemplate;
@@ -37,9 +35,6 @@ import static com.linkfix.util.SesionUtils.*;
 
 @Controller
 public class UsuarioController {
-
-    @Autowired
-    private AUDUsuarioHistorialService audUsuarioHistorialService;
 
     @Autowired
     private UsuarioService usuarioService;
