@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inicio - Home</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .btn-outline-success-custom {
+            color: #198754;
+            border: 2px solid #198754;
+            background-color: #ffffff;
+            transition: 0.3s ease;
+        }
+
+        .btn-outline-success-custom:hover {
+            color: #ffffff;
+            background-color: #198754;
+        }
+
+        .btn-outline-danger-smooth {
+            transition: 0.3s ease;
+        }
+
+        .btn-outline-danger-smooth:hover {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .text-dark {
+            color: #ccc !important;
+        }
+
+        .info-section {
+            margin-top: 40px;
+        }
+
+        .highlight-box {
+            background-color: #0d6efd;
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .highlight-box a {
+            color: white;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .highlight-box a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="bg-dark text-white">
+        <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+<div class="container py-5" >
+    <div class="card mx-auto p-4" th:if="${session.logueado == null}" style="max-width: 700px;">
+        <div class="card-body">
+            <!-- Sin sesión -->
+            <div>
+                <div class="alert alert-warning text-center">Sesión no válida</div>
+                <div class="text-center">
+                    <a th:href="@{/login}" class="btn btn-primary">Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección informativa -->
+    <div class="info-section text-center mt-5" th:if="${session.logueado != null}">
+        <h2 class="text-primary mb-3">¿Qué puedes hacer con Linkfix?</h2>
+        <p>Linkfix es una plataforma que conecta a usuarios con técnicos calificados para la reparación de electrodomésticos. A través de un sistema georreferenciado, puedes encontrar especialistas cercanos, coordinar horarios, y calificarlos al finalizar el servicio.</p>
+
+        <ul class="text-start mt-3">
+            <li>✔ Registro y validación de técnicos por especialidad y ubicación</li>
+            <li>✔ Búsqueda inteligente según ubicación y horario disponible</li>
+            <li>✔ Sistema de solicitudes, chat y calificaciones</li>
+            <li>✔ Soporte de incidencias y seguimiento administrativo</li>
+        </ul>
+    </div>
+
+    <!-- Cómo funciona -->
+    <div class="info-section text-center" th:if="${session.logueado != null}">
+        <h3 class="text-primary mb-3">¿Cómo funciona?</h3>
+        <p>Los técnicos definen su disponibilidad semanal, y los clientes pueden buscar y solicitar servicios según día, hora y ubicación. Los técnicos aceptan las solicitudes y ambos pueden comunicarse a través del sistema. Luego del servicio, los usuarios pueden dejar valoraciones.</p>
+    </div>
+
+    <!-- Beneficios -->
+    <div class="info-section" th:if="${session.logueado != null}">
+        <h3 class="text-primary text-center mb-4">Beneficios esperados</h3>
+        <ul>
+            <li>🌱 <strong>Menos residuos electrónicos:</strong> Fomentamos la reparación, lo que podría reducir hasta un 20% los desechos en 5 años.</li>
+            <li>⏱ <strong>Menos tiempo buscando técnicos:</strong> Encuentra y coordina un servicio en menos de 30 minutos.</li>
+            <li>💼 <strong>Más empleos técnicos:</strong> Apoyamos el crecimiento de técnicos independientes en zonas rurales.</li>
+            <li>📍 <strong>Mejor cobertura:</strong> Amplía el acceso a servicios en zonas con poca oferta técnica.</li>
+        </ul>
+    </div>
+
+    <!-- Llamado a la acción -->
+    <div class="highlight-box mt-5" th:if="${session.logueado != null}">
+        <h4>¿Necesitas ayuda técnica ahora?</h4>
+        <p>Busca técnicos calificados cerca de ti y coordina tu servicio en minutos.</p>
+        <a th:href="@{/servicio/buscar}" class="btn btn-dark mt-2">Buscar Técnicos</a>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

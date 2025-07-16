@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Listado de Técnicos Disponibles</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+        }
+
+        .form-label, label {
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .form-control, .form-select {
+            background-color: #f8f9fa;
+            color: #212529;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+        }
+
+        .btn-custom {
+            background-color: #ffffff;
+            color: #0d6efd;
+            border: 1px solid #0d6efd;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-custom:hover {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        .table {
+            background-color: #1e1e1e;
+            color: #ffffff;
+        }
+
+        .table thead {
+            background-color: #343a40;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav th:if="${session.logueado != null}">
+    <div th:replace="~{fragments/header :: navbar}"></div>
+</nav>
+
+<div class="container mt-5">
+    <div th:if="${error}" class="alert alert-danger text-center mb-0" th:text="${error}"></div>
+    <div th:if="${mensaje}" class="alert alert-success text-center mb-0" th:text="${mensaje}"></div>
+    <h2 class="text-center mb-4 text-primary">Buscar Técnicos Disponibles</h2>
+
+    <div class="card mb-4">
+        <form method="get" th:action="@{/servicio/buscar}">
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <label for="idElectrodomestico" class="form-label">Electrodoméstico</label>
+                    <select class="form-select" name="idElectrodomestico" id="idElectrodomestico">
+                        <option value="">-- Todos --</option>
+                        <option th:each="elec : ${listaElectrodomesticos}" 
+                                th:value="${elec.id}" 
+                                th:text="${elec.nombre}"
+                                th:selected="${elec.id} == ${idElectrodomestico}"></option>
+                    </select>
+                </div>
+
+                <div class="col-md-2" hidden>
+                    <label for="idDia" class="form-label">Día</label>
+                    <select class="form-select" name="idDia" id="idDia">
+                        <option value="">-- Todos --</option>
+                        <option th:each="dia : ${listaDias}" 
+                                th:value="${dia.id}" 
+                                th:text="${dia.nombre}" 
+                                th:selected="${dia.id} == ${idDia}"></option>
+                    </select>
+                </div>
+
+                <div class="col-md-2" th:if="${idDia != null and idDia != ''}" hidden>
+                    <label for="formHoraInicio" class="form-label">Desde</label>
+                    <input type="time" id="formHoraInicio" name="formHoraInicio" th:value="${formHoraInicio}" class="form-control"/>
+                </div>
+
+                <div class="col-md-2" th:if="${idDia != null and idDia != ''}" hidden>
+                    <label for="formHoraFin" class="form-label">Hasta</label>
+                    <input type="time" id="formHoraFin" name="formHoraFin" th:value="${formHoraFin}" class="form-control"/>
+                </div>
+
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-custom w-100">Buscar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resultado vacío -->
+    <div th:if="${#lists.isEmpty(listadoTecnicos)}" class="alert alert-warning text-center">
+        No se encontraron técnicos disponibles con los criterios seleccionados.
+    </div>
+
+    <!-- Tabla de técnicos -->
+    <div th:if="${!#lists.isEmpty(listadoTecnicos)}">
+        <div class="card">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Nombre completo</th>
+                        <th>Correo</th>
+                        <th>Calificación</th>
+                        <th th:if="${idDia != null and idDia != ''}">Día</th>
+                        <th th:if="${idDia != null and idDia != ''}">Hora Inicio</th>
+                        <th th:if="${idDia != null and idDia != ''}">Hora Fin</th>
+                        <th>Especialista</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="tecnico : ${listadoTecnicos}">
+                        <td th:text="${tecnico.nombreCompleto}">Juan Pérez</td>
+                        <td th:text="${tecnico.correo}">juan@mail.com</td>
+                        <td th:text="${tecnico.calificacion}">4.5</td>
+                        <td th:if="${idDia != null and idDia != ''}" th:text="${tecnico.nombreDia} ?: '—'">Lunes</td>
+                        <td th:if="${idDia != null and idDia != ''}" th:text="${tecnico.horaInicio} ?: '—'">09:00</td>
+                        <td th:if="${idDia != null and idDia != ''}" th:text="${tecnico.horaFin} ?: '—'">12:00</td>
+                        <td th:text="${tecnico.tieneEspecialidad == 1 ? 'Sí' : 'No'}">Sí</td>
+                        <td>
+                            <form th:action="@{/servicio/solicitar}" method="post">
+                                <input type="hidden" name="idTecnico" th:value="${tecnico.id}"/>
+                                <th:block th:if="${idElectrodomestico != null}">
+                                    <input type="hidden" name="idElectrodomestico" th:value="${idElectrodomestico}" />
+                                </th:block>
+                                <button type="submit" class="btn btn-sm btn-primary">Solicitar</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Paginación -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <span th:text="'Página ' + ${page + 1} + ' de ' + ${totalPages}"></span>
+            <div class="btn-group" role="group">
+                <a class="btn btn-outline-light btn-sm" th:if="${page > 0}" th:href="@{/servicio(page=0, size=${size}, idElectrodomestico=${idElectrodomestico}, idDia=${idDia}, formHoraInicio=${formHoraInicio}, formHoraFin=${formHoraFin})}">Primera</a>
+                <a class="btn btn-outline-light btn-sm" th:if="${page > 0}" th:href="@{/servicio(page=${page - 1}, size=${size}, idElectrodomestico=${idElectrodomestico}, idDia=${idDia}, formHoraInicio=${formHoraInicio}, formHoraFin=${formHoraFin})}">Anterior</a>
+                <a class="btn btn-outline-light btn-sm" th:if="${page + 1 < totalPages}" th:href="@{/servicio(page=${page + 1}, size=${size}, idElectrodomestico=${idElectrodomestico}, idDia=${idDia}, formHoraInicio=${formHoraInicio}, formHoraFin=${formHoraFin})}">Siguiente</a>
+                <a class="btn btn-outline-light btn-sm" th:if="${page + 1 < totalPages}" th:href="@{/servicio(page=${totalPages - 1}, size=${size}, idElectrodomestico=${idElectrodomestico}, idDia=${idDia}, formHoraInicio=${formHoraInicio}, formHoraFin=${formHoraFin})}">Última</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a th:href="@{/home}" class="btn btn-custom">
+            <i class="bi bi-house-door-fill"></i> Volver al inicio
+        </a>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Iniciar sesión</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .form-label {
+            color: #ffffff !important;
+        }
+
+        .form-control {
+            background-color: #f8f9fa;
+            color: #212529;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            border-color: #0d6efd;
+            background-color: #ffffff;
+            outline: none;
+            box-shadow: none;
+        }
+
+        .btn-primary-smooth {
+            background-color: #ffffff;
+            color: #0d6efd;
+            border: 1px solid #0d6efd;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-primary-smooth:hover {
+            background-color: #0d6efd;
+            color: #ffffff;
+        }
+
+        h2.text-primary {
+            color: #0d6efd !important;
+        }
+
+        .link-primary {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+
+        .link-primary:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            border-radius: 8px;
+            color: #212529;
+        }
+    </style>
+</head>
+<body class="bg-dark text-white">
+
+<div class="d-flex justify-content-center align-items-center min-vh-100 px-2">
+    <div class="card shadow-sm w-100" style="max-width: 450px;">
+        <div class="card-body">
+            <h2 class="text-center mb-4 text-primary">Iniciar sesión</h2>
+
+            <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+            <div th:if="${mensaje}" class="alert alert-info" role="alert" th:text="${mensaje}"></div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="mb-3">
+                    <label for="correo" class="form-label">Correo electrónico:</label>
+                    <input type="email" id="correo" name="correo" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="contrasena" class="form-label">Contraseña:</label>
+                    <input type="password" id="contrasena" name="contrasena" class="form-control" required>
+                </div>
+
+                <div class="d-grid mb-3">
+                    <button type="submit" class="btn btn-primary btn-primary-smooth">Iniciar sesión</button>
+                </div>
+            </form>
+
+            <div class="text-center">
+                <p class="mb-0">
+                    ¿No tienes una cuenta?
+                    <a th:href="@{/registro}" class="link-primary">Regístrate aquí</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

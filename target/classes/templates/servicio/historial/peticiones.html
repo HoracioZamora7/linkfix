@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Peticiones</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+</head>
+
+<body>
+        <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+    <div class="container mt-5">
+        <h2>Historial de Peticiones</h2>
+
+        <!-- Mensajes flash -->
+        <div th:if="${error}" class="alert alert-danger text-center mb-0" th:text="${error}"></div>
+        <div th:if="${mensaje}" class="alert alert-success text-center mb-0" th:text="${mensaje}"></div>
+
+        <form method="get" th:action="@{/servicio/historialPeticiones}" class="mb-3 mt-3">
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="estados" value="4"
+                    th:checked="${estadosSeleccionados.contains(4)}" id="estado4">
+                <label class="form-check-label" for="estado4">Rechazado</label>
+            </div>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="estados" value="8"
+                    th:checked="${estadosSeleccionados.contains(8)}" id="estado8">
+                <label class="form-check-label" for="estado8">Pendiente</label>
+            </div>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="estados" value="9"
+                    th:checked="${estadosSeleccionados.contains(9)}" id="estado9">
+                <label class="form-check-label" for="estado9">Aceptado</label>
+            </div>
+
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" name="estados" value="7"
+                    th:checked="${estadosSeleccionados.contains(7)}" id="estado7">
+                <label class="form-check-label" for="estado7">Finalizado</label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-sm mt-3">Filtrar</button>
+        </form>
+
+
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Teléfono del cliente</th>
+                    <th>Distrito</th>
+                    <th>Dirección</th>
+                    <th>Fecha de la solicitud</th>
+                    <th>Fecha para la visita</th>
+                    <th>Fecha de finalización</th>
+                    <th>Estado</th>
+                    <th>Detalle</th>
+                    <th>Calificación</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="peticion : ${peticiones.content}">
+                    <td th:text="${peticion.usuario.persona.nombre} + ' ' + ${peticion.usuario.persona.apellidos}">---</td>
+                    <td th:text="${peticion.usuario.persona.telefono}"></td>
+                    <td th:text="${peticion.usuario.persona.ubigeo.name}"></td>
+                    <td th:text="${peticion.usuario.persona.direccion}"></td>
+                    <td th:text="${#temporals.format(peticion.fecha_solicitud, 'yyyy-MM-dd HH:mm')}">---</td>
+                    <td th:text="${#temporals.format(peticion.fecha_visita, 'yyyy-MM-dd HH:mm')}">---</td>
+                    <td th:text="${#temporals.format(peticion.fecha_finalizacion, 'yyyy-MM-dd HH:mm')}">---</td>
+                    <td th:text="${peticion.estado.nombre}">---</td>
+                    <td>
+                        <a th:href="@{/servicio/detalle(id=${peticion.id})}" class="btn btn-primary btn-sm">Ver detalle</a>
+                    </td>
+                    <td>
+                        <span th:if="${peticion.estado.id == 7} and ${peticion.calificacion != null}">
+                            <span th:each="i : ${#numbers.sequence(1, peticion.calificacion)}">★</span>
+                        </span>
+                        <span th:if="${peticion.estado.id == 7} and ${peticion.calificacion == null}">
+                            Pendiente de calificación 
+                        </span>
+                    </td>
+                    <td>
+                        <a th:if="${peticion.estado.id == 8}" th:href="@{/servicio/confirmarSolicitud(servicio=${peticion.id})}" class="btn btn-primary btn-sm">Aceptar/Rechazar solicitud</a>
+                        <form th:if="${peticion.estado.id == 9}" 
+                            th:action="@{/servicio/completar}" method="post">
+                            <input type="hidden" name="id" th:value="${peticion.id}" />
+                            <button type="submit" class="btn btn-success btn-sm">Completar</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <nav th:if="${peticiones.totalPages > 1}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${peticiones.first} ? 'disabled'">
+                    <a class="page-link" th:href="@{|/servicio/historialPeticiones?page=${peticiones.number - 1}&estados=${#strings.listJoin(estadosSeleccionados, ',')}|}">Anterior</a>
+                </li>
+                <li class="page-item disabled">
+                    <a class="page-link">Página <span th:text="${peticiones.number + 1}"></span> de <span th:text="${peticiones.totalPages}"></span></a>
+                </li>
+                <li class="page-item" th:classappend="${peticiones.last} ? 'disabled'">
+                    <a class="page-link" th:href="@{|/servicio/historialPeticiones?page=${peticiones.number + 1}&estados=${#strings.listJoin(estadosSeleccionados, ',')}|}">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</body>
+</html>

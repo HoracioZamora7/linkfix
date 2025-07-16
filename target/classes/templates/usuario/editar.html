@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Perfil</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            margin-bottom: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+        }
+
+        .card {
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+        }
+
+        h2 {
+            color: #0d6efd;
+        }
+
+        .form-label {
+            color: #ffffff !important;
+            font-weight: 500;
+        }
+
+        .form-control, .form-select {
+            background-color: #f8f9fa;
+            color: #212529;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            padding: 10px;
+            transition: border 0.2s, background-color 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #0d6efd;
+            background-color: #ffffff;
+            outline: none;
+            box-shadow: none;
+        }
+
+        .btn-save {
+            background-color: #ffffff;
+            color: #198754;
+            border: 1px solid #198754;
+            transition: all 0.3s ease-in-out;
+            margin-right: 10px;
+        }
+
+        .btn-save:hover {
+            background-color: #198754;
+            color: #ffffff;
+        }
+
+        .btn-cancel {
+            background-color: #ffffff;
+            color: #6c757d;
+            border: 1px solid #6c757d;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .btn-cancel:hover {
+            background-color: #6c757d;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Editar Perfil</h2>
+
+    <div class="card">
+        <form th:action="@{/perfil/editar}" th:object="${usuarioDTO}" method="post">
+            <div class="mb-3">
+                <label for="correo" class="form-label">Correo:</label>
+                <input type="email" id="correo" th:field="*{correo}" class="form-control" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="telefono" class="form-label">Teléfono:</label>
+                <input type="text" id="telefono" th:field="*{telefono}" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="direccion" class="form-label">Dirección:</label>
+                <input type="text" id="direccion" th:field="*{direccion}" class="form-control">
+            </div>
+
+            <div class="mb-3">
+                <label for="departamento" class="form-label">Departamento:</label>
+                <select id="departamento" name="departamento" class="form-select" required>
+                    <option value="">Seleccione departamento</option>
+                    <option th:each="dep : ${departamentos}" th:value="${dep.id}" th:text="${dep.name}"></option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="provincia" class="form-label">Provincia:</label>
+                <select id="provincia" name="provincia" class="form-select" required>
+                    <option value="">Seleccione provincia</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="distrito" class="form-label">Distrito:</label>
+                <select id="distrito" th:field="*{ubigeo}" name="ubigeoId" class="form-select" required>
+                    <option value="">Seleccione distrito</option>
+                </select>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-save">Guardar Cambios</button>
+                <a th:href="@{/perfil}" class="btn btn-cancel">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        const departamentoSelect = document.getElementById("departamento");
+        const provinciaSelect = document.getElementById("provincia");
+        const distritoSelect = document.getElementById("distrito");
+
+        const selectedProvinciaId = [[${usuarioDTO.provinciaId}]];
+        const selectedDistritoId = [[${usuarioDTO.ubigeo}]];
+
+        if (departamentoSelect.value !== "") {
+            fetch(`/api/provincia/listarPorDepartamento?departmentId=${departamentoSelect.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    provinciaSelect.innerHTML = '<option value="">Seleccione provincia</option>';
+                    data.forEach(p => {
+                        const sel = p.id === selectedProvinciaId ? 'selected' : '';
+                        provinciaSelect.innerHTML += `<option value="${p.id}" ${sel}>${p.name}</option>`;
+                    });
+                    if (provinciaSelect.value) {
+                        fetch(`/api/distrito/listarPorProvincia?provinceId=${provinciaSelect.value}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                distritoSelect.innerHTML = '<option value="">Seleccione distrito</option>';
+                                data.forEach(d => {
+                                    const sel = d.id === selectedDistritoId ? 'selected' : '';
+                                    distritoSelect.innerHTML += `<option value="${d.id}" ${sel}>${d.name}</option>`;
+                                });
+                            });
+                    }
+                });
+        }
+
+        departamentoSelect.addEventListener("change", function () {
+            fetch(`/api/provincia/listarPorDepartamento?departmentId=${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    provinciaSelect.innerHTML = '<option value="">Seleccione provincia</option>';
+                    data.forEach(p => {
+                        provinciaSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                    });
+                    distritoSelect.innerHTML = '<option value="">Seleccione distrito</option>';
+                });
+        });
+
+        provinciaSelect.addEventListener("change", function () {
+            fetch(`/api/distrito/listarPorProvincia?provinceId=${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    distritoSelect.innerHTML = '<option value="">Seleccione distrito</option>';
+                    data.forEach(d => {
+                        distritoSelect.innerHTML += `<option value="${d.id}">${d.name}</option>`;
+                    });
+                });
+        });
+    });
+</script>
+</body>
+</html>

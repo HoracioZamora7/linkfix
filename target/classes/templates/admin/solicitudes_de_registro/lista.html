@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Validar Técnicos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/bootstrap-icons.css}" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .badge.bg-success {
+            font-size: 0.9rem;
+        }
+
+        .badge.bg-warning {
+            font-size: 0.9rem;
+        }
+
+        .table thead th {
+            background-color: #e9ecef;
+        }
+
+        .navbar {
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+    <nav th:if="${session.logueado != null}">
+        <div th:replace="~{fragments/header :: navbar}"></div>
+    </nav>
+
+<div class="container">
+    <h2 class="mb-4 text-center">Validación de Técnicos</h2>
+
+    <!-- Filtro por estado -->
+    <form method="get" th:action="@{/solicitudes/lista}" class="row g-3 align-items-center mb-4">
+        <div class="col-auto">
+            <label for="estadoFilter" class="col-form-label">Filtrar por estado:</label>
+        </div>
+        <div class="col-auto">
+            <select name="estado" id="estadoFilter" class="form-select">
+                <option th:selected="${estado == null}">Seleccionar</option>
+                <option th:value="true" th:selected="${estado == 'true'}">Aprobado</option>
+                <option th:value="false" th:selected="${estado == 'false'}">Pendiente</option>
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+
+    <!-- Tabla de solicitudes -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Correo Técnico</th>
+                    <th>Apellidos</th>
+                    <th>Nombres</th>
+                    <th>RUC</th>
+                    <th>DNI</th>
+                    <th>Fecha Registro</th>
+                    <th>Fecha Revisión</th>
+                    <th>Estado</th>
+                    <th>Correo Admin</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="solicitud : ${solicitudes}">
+                    <td th:text="${solicitud.id}"></td>
+                    <td th:text="${solicitud.tecnico.correo}"></td>
+                    <td th:text="${solicitud.tecnico.persona.apellidos}"></td>
+                    <td th:text="${solicitud.tecnico.persona.nombre}"></td>
+                    <td th:text="${solicitud.tecnico.persona.ruc}"></td>
+                    <td th:text="${solicitud.tecnico.persona.dni}"></td>
+                    <td th:text="${#temporals.format(solicitud.fecha_registro, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td th:text="${solicitud.fecha_revision != null ? #temporals.format(solicitud.fecha_revision, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                    <td>
+                        <span th:text="${solicitud.estado ? 'Revisado' : 'Pendiente'}"
+                              th:classappend="${solicitud.estado ? 'badge bg-success' : 'badge bg-warning text-dark'}">
+                        </span>
+                    </td>
+                    <td th:text="${solicitud.administrador != null ? solicitud.administrador.correo : '-'}"></td>
+                    <td>
+                        <a th:href="@{'/solicitudes/detalle/' + ${solicitud.id}}" class="btn btn-sm btn-outline-info">Detalle</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(solicitudes)}">
+                    <td colspan="11" class="text-center text-muted">Sin resultados</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- JS Bootstrap local -->
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+
+</body>
+</html>
