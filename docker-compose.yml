@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  app_linkfix:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_PASSWORD: "${DB_PASSWORD}"
+      DB_URL: "jdbc:mysql://linkfix_db:3306/linkfix?createDatabaseIfNotExist=true&serverTimezone=UTC"
+      DB_USERNAME: "${DB_USERNAME}"
+      APIPERUDEV_TOKEN: "${APIPERUDEV_TOKEN}"
+      SMTP_HOST: "${SMTP_HOST}"
+      SMTP_PORT: "${SMTP_PORT}"
+      SMTP_USERNAME: "${SMTP_USERNAME}"
+      SMTP_PASSWORD: "${SMTP_PASSWORD}"
+      APP_HOST_BASEURL: "${APP_HOST_BASEURL}"
+    restart: always
+    depends_on:
+      - linkfix_db
+
+  linkfix_db:
+    image: mysql:8.0.33
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: "linkfix"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+    command: --lower_case_table_names=1
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
